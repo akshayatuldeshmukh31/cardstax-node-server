@@ -58,7 +58,8 @@ function findInDb(userName, password, res){
 		}
 		else if(doc!=null){
 			console.log("Data retrieved successfully!");
-			res.sendFile(__dirname + environmentVariables.successfulMessage);
+			//res.sendFile(__dirname + environmentVariables.successfulMessage);
+			res.end("Success");
 		}
 		else{
 			console.log("No such data");
