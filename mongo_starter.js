@@ -54,7 +54,8 @@ function findInDb(userName, password, res){
 	cursor.each(function(err,doc){
 		if(err){
 			console.log("Error in finding data - "+err);
-			res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			res.end("Error");
 		}
 		else if(doc!=null){
 			console.log("Data retrieved successfully!");
@@ -63,7 +64,8 @@ function findInDb(userName, password, res){
 		}
 		else{
 			console.log("No such data");
-			res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			res.end("Failure");
 		}
 	});
 }
