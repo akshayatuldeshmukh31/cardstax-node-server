@@ -46,30 +46,31 @@ app.post(environmentVariables.register, function(req,res){
 	var jsonObjForMasterColl = JSON.parse(jsonMasterTemp);
 	console.log("REGISTER(POST)--> JSON for master collection - " + JSON.stringify(jsonObjForMasterColl,null,2));
 	
-	updateIdFile();
 	
 	//Call to insert details into login collection of the server
 	mongo.insertIntoLoginColl(jsonObjForLoginColl, function(result){
 		console.log("REGISTER(POST)--> Result of inserting into login collection - " + result);
 		outcomeDecider = outcomeDecider&&result;
-	});
 
-	//Call to insert details into master collection of the server
-	mongo.insertIntoMasterColl(jsonObjForMasterColl, function(result){
-		console.log("REGISTER(POST)--> Result of inserting into master collection - " + result);
-		outcomeDecider = outcomeDecider&&result;
-	});
+		//Call to insert details into master collection of the server
+		mongo.insertIntoMasterColl(jsonObjForMasterColl, function(result){
+			console.log("REGISTER(POST)--> Result of inserting into master collection - " + result);
+			outcomeDecider = outcomeDecider&&result;
 
-	if(outcomeDecider==0){
-		res.send("0");
-		console.log("REGISTER(POST)--> Successful insertion of record with UID " + userId);
-	}
-	else{
-		res.send("1");
-		console.log("REGISTER(POST)--> Unsuccessful insertion of record with UID " + userId);
-	}
-	
+			//Sending a response to the request
+			if(outcomeDecider==0){
+				res.send("0");
+				console.log("REGISTER(POST)--> Unsuccessful insertion of record with UID " + userId);
+			}
+			else{
+				res.send("1");
+				console.log("REGISTER(POST)--> Successful insertion of record with UID " + userId);
+				updateIdFile();
+			}		
+		});	
+	});
 });
+
 
 app.post(environmentVariables.login, function(req,res){
 	userName = req.body.u_name;
