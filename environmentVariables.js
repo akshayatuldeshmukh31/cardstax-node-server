@@ -1,23 +1,25 @@
 portNo = 8888;
-mongoDbUri = "mongodb://localhost:27017/loginDBTest1";
-mongoCollectionName = "login_details";
+mongoDbUri = "mongodb://localhost:27017/master_server";
+mongoLoginDetailsCollectionName = "login_details";
+mongoMasterCollectionName = "master_collection";
 
-registerDetails = "/registerDetails_post";
-loginDetails = "/loginDetails_post";
-removeDetails = "/removeDetails_post";
-updateDetails = "/updateDetails_post";
+register = "/register";
+login = "/process";
+remove = "/remove";
+update = "/update";
 
 successfulMessage = "/sc.html";
 unsuccessfulMessage = "/unsc.html";
 
 exports.portNo = portNo;
 exports.mongoDbUri = mongoDbUri;
-exports.mongoCollectionName = mongoCollectionName;
+exports.mongoLoginDetailsCollectionName = mongoLoginDetailsCollectionName;
+exports.mongoMasterCollectionName = mongoMasterCollectionName;
 
-exports.registerDetails = registerDetails;
-exports.loginDetails = loginDetails;
-exports.removeDetails = removeDetails;
-exports.updateDetails = updateDetails;
+exports.register = register;
+exports.login = login;
+exports.remove = remove;
+exports.update = update;
 
 exports.successfulMessage = successfulMessage;
 exports.unsuccessfulMessage = unsuccessfulMessage;

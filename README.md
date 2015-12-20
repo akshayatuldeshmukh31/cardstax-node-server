@@ -1,1 +1,3 @@
- This repository contains the code for the Node.js server of our major project. The code is not presented in a runnable format as it needs to be deployed in cloud. 
+Work done till date - 
+
+1. Developed initial function for implementing the registration module on the server side. Still need to look into callbacks for a proper control flow.

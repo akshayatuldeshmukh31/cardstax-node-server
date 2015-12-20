@@ -5,10 +5,11 @@ var environmentVariables = require("./environmentVariables");
 var MongoClient = mongodb.MongoClient;
 var uri = environmentVariables.mongoDbUri;
 var database = null;
-var appCollection = null;
+var loginCollection = null;
+var masterCollection = null;
 var cursor;
 
-//Connection to MongoDB database
+//Connection to MongoDB database in the server
 function startMongoServer(){
 	MongoClient.connect(uri, function(err,db){
 		if(err)
@@ -16,12 +17,29 @@ function startMongoServer(){
 		else if(db){
 			console.log("Successfully connected to database!");
 			database = db;
-			appCollection = db.collection(environmentVariables.mongoCollectionName);
-			appCollection.ensureIndex({"u_name":1, unique:true}, function(err,results){
+			
+			//Login Collection
+			loginCollection = db.collection(environmentVariables.mongoLoginDetailsCollectionName);
+			loginCollection.ensureIndex({"_id":1, unique:true}, function(err,results){
 				if(err)
-					console.log("Error in ensuring index: "+err);
+					console.log("LOGIN_DETAILS(SERVER)--> Error in ensuring index for id: "+err);
 				else if(results)
-					console.log("Index creation is successful! "+results);
+					console.log("LOGIN_DETAILS(SERVER)--> Index creation is successful for id! "+results);
+			});
+			loginCollection.ensureIndex({"userName":1, unique:true}, function(err,results){
+				if(err)
+					console.log("LOGIN_DETAILS(SERVER)--> Error in ensuring index for userName: "+err);
+				else if(results)
+					console.log("LOGIN_DETAILS(SERVER)--> Index creation is successful for userName! "+results);
+			});
+
+			//Master Collection
+			masterCollection = db.collection(environmentVariables.mongoMasterCollectionName);
+			masterCollection.ensureIndex({"_id":1, unique:true}, function(err,results){
+				if(err)
+					console.log("MASTER COLL(SERVER)--> Error in ensuring index for id: "+err);
+				else if(results)
+					console.log("MASTER COLL(SERVER)--> Index creation is successful for id! "+results);
 			});
 		}
 	});
@@ -32,24 +50,41 @@ function giveDbName(){
 	return database;
 }
 
-function insertIntoDb(userId, userName, password, res){
+function insertIntoLoginColl(jsonObjForLoginColl, callback){
 	var flag;
-	console.log("Parameter userId " + userId);
-	appCollection.insertOne({"_id": userId, "u_name": userName, "pswd": password}, function(err,result){
+	loginCollection.insertOne(jsonObjForLoginColl, function(err,result){
 		if(err){
-			console.log("Error in inserting data - "+err);
-			res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			console.log("LOGIN_DETAILS(SERVER)--> Error in inserting data - "+err);
+			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			return callback(0);
 		}
 		else if(result){
-			console.log("Data entered successfully! " + result);
-			res.sendFile(__dirname + environmentVariables.successfulMessage);
+			console.log("LOGIN_DETAILS(SERVER)--> Data entered successfully! " + result);
+			//res.sendFile(__dirname + environmentVariables.successfulMessage);
+			return callback(1);
+		}
+	});
+}
+
+function insertIntoMasterColl(jsonObjForMasterColl, callback){
+	var flag;
+	masterCollection.insertOne(jsonObjForMasterColl, function(err,result){
+		if(err){
+			console.log("MASTER COLL(SERVER)--> Error in inserting data - "+err);
+			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			return callback(0);
+		}
+		else if(result){
+			console.log("MASTER COLL(SERVER)--> Data entered successfully! " + result);
+			//res.sendFile(__dirname + environmentVariables.successfulMessage);
+			return callback(1);
 		}
 	});
 }
 
 function findInDb(userName, password, res){
 	cursor = null;
-	cursor = appCollection.find({"u_name": userName, "pswd": password});
+	cursor = loginCollection.find({"u_name": userName, "pswd": password});
 	
 	cursor.each(function(err,doc){
 		if(err){
@@ -71,7 +106,7 @@ function findInDb(userName, password, res){
 }
 
 function updateDb(userName, password, res){
-	appCollection.updateOne({"u_name": userName},  {$set:{"pswd": password}}, {w:1}, function(err,object){
+	loginCollection.updateOne({"u_name": userName},  {$set:{"pswd": password}}, {w:1}, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
 			console.log("Error in updating data - "+err);
@@ -89,7 +124,7 @@ function updateDb(userName, password, res){
 }
 
 function removeFromDb(userName, password, res){
-	appCollection.deleteOne({"u_name": userName}, function(err,object){
+	loginCollection.deleteOne({"u_name": userName}, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
 			console.log("Error in deleting data - "+err);
@@ -108,7 +143,9 @@ function removeFromDb(userName, password, res){
 
 exports.giveDbName = giveDbName;
 exports.startMongoServer = startMongoServer;
-exports.insertIntoDb = insertIntoDb;
+exports.insertIntoLoginColl = insertIntoLoginColl;
 exports.findInDb = findInDb;
 exports.updateDb = updateDb;
 exports.removeFromDb = removeFromDb;
+
+exports.insertIntoMasterColl = insertIntoMasterColl;
