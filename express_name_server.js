@@ -52,22 +52,28 @@ app.post(environmentVariables.register, function(req,res){
 		console.log("REGISTER(POST)--> Result of inserting into login collection - " + result);
 		outcomeDecider = outcomeDecider&&result;
 
-		//Call to insert details into master collection of the server
-		mongo.insertIntoMasterColl(jsonObjForMasterColl, function(result){
-			console.log("REGISTER(POST)--> Result of inserting into master collection - " + result);
-			outcomeDecider = outcomeDecider&&result;
+		if(outcomeDecider==1){
+			//Call to insert details into master collection of the server
+			mongo.insertIntoMasterColl(jsonObjForMasterColl, function(result){
+				console.log("REGISTER(POST)--> Result of inserting into master collection - " + result);
+				outcomeDecider = outcomeDecider&&result;
 
-			//Sending a response to the request
-			if(outcomeDecider==0){
-				res.send("0");
-				console.log("REGISTER(POST)--> Unsuccessful insertion of record with UID " + userId);
-			}
-			else{
-				res.send("1");
-				console.log("REGISTER(POST)--> Successful insertion of record with UID " + userId);
-				updateIdFile();
-			}		
-		});	
+				//Sending a response to the request
+				if(outcomeDecider==0){
+					res.send("0");
+					console.log("REGISTER(POST)--> Unsuccessful insertion of record with UID " + userId);
+				}
+				else{
+					res.send("1");
+					console.log("REGISTER(POST)--> Successful insertion of record with UID " + userId);
+					updateIdFile();
+				}		
+			});	
+		}
+		else{
+			res.send("0");
+			console.log("REGISTER(POST)--> Unsuccessful insertion of record with UID " + userId);
+		}
 	});
 });
 
