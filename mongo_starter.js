@@ -56,12 +56,12 @@ function insertIntoLoginColl(jsonObjForLoginColl, callback){
 		if(err){
 			console.log("LOGIN_DETAILS(SERVER)--> Error in inserting data - "+err);
 			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
-			return callback(0);
+			return callback(0, err);
 		}
 		else if(result){
 			console.log("LOGIN_DETAILS(SERVER)--> Data entered successfully! " + result);
 			//res.sendFile(__dirname + environmentVariables.successfulMessage);
-			return callback(1);
+			return callback(1, null);
 		}
 	});
 }
@@ -72,12 +72,12 @@ function insertIntoMasterColl(jsonObjForMasterColl, callback){
 		if(err){
 			console.log("MASTER COLL(SERVER)--> Error in inserting data - "+err);
 			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
-			return callback(0);
+			return callback(0, err);
 		}
 		else if(result){
 			console.log("MASTER COLL(SERVER)--> Data entered successfully! " + result);
 			//res.sendFile(__dirname + environmentVariables.successfulMessage);
-			return callback(1);
+			return callback(1, null);
 		}
 	});
 }

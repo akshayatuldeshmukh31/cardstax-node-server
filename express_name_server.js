@@ -20,7 +20,6 @@ app.use(bodyParser.urlencoded({extended:true}));
 //For registering new users of the app
 app.post(environmentVariables.register, function(req,res){
 
-	var outcomeDecider = 1;	
 	var jsonObj = req.body;
 	console.log("REGISTER(POST)--> JSON received - " + JSON.stringify(jsonObj,null,2));
 
@@ -48,30 +47,40 @@ app.post(environmentVariables.register, function(req,res){
 	
 	
 	//Call to insert details into login collection of the server
-	mongo.insertIntoLoginColl(jsonObjForLoginColl, function(result){
+	mongo.insertIntoLoginColl(jsonObjForLoginColl, function(result, err){
 		console.log("REGISTER(POST)--> Result of inserting into login collection - " + result);
-		outcomeDecider = outcomeDecider&&result;
-
-		if(outcomeDecider==1){
+		
+		if(err==null){
 			//Call to insert details into master collection of the server
-			mongo.insertIntoMasterColl(jsonObjForMasterColl, function(result){
+			mongo.insertIntoMasterColl(jsonObjForMasterColl, function(result, err){
 				console.log("REGISTER(POST)--> Result of inserting into master collection - " + result);
-				outcomeDecider = outcomeDecider&&result;
-
+				
 				//Sending a response to the request
-				if(outcomeDecider==0){
-					res.send("0");
+				if(err){
+					res.setHeader('Content-Type', 'application/json');
+					res.send(JSON.stringify({
+						"Success":"0",
+						"Error": err
+					}));
 					console.log("REGISTER(POST)--> Unsuccessful insertion of record with UID " + userId);
 				}
 				else{
-					res.send("1");
+					res.setHeader('Content-Type', 'application/json');
+					res.send(JSON.stringify({
+						"Success":"1",
+						"Error": err
+					}));
 					console.log("REGISTER(POST)--> Successful insertion of record with UID " + userId);
 					updateIdFile();
 				}		
 			});	
 		}
 		else{
-			res.send("0");
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify({
+					"Success":"0",
+					"Error": err
+			}));
 			console.log("REGISTER(POST)--> Unsuccessful insertion of record with UID " + userId);
 		}
 	});
