@@ -4,7 +4,7 @@ mongoLoginDetailsCollectionName = "login_details";
 mongoMasterCollectionName = "master_collection";
 
 register = "/register";
-login = "/process";
+login = "/login";
 remove = "/remove";
 update = "/update";
 

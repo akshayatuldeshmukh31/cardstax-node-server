@@ -82,25 +82,20 @@ function insertIntoMasterColl(jsonObjForMasterColl, callback){
 	});
 }
 
-function findInDb(userName, password, res){
+function findInLoginDbForLoggingIn(jsonObjForLoginColl, callback){
 	cursor = null;
-	cursor = loginCollection.find({"u_name": userName, "pswd": password});
-	
-	cursor.each(function(err,doc){
+	loginCollection.findOne(jsonObjForLoginColl, function(err, item){
 		if(err){
-			console.log("Error in finding data - "+err);
-			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
-			res.end("Error");
+			console.log("LOGIN_DETAILS(SERVER)--> Error in finding data - "+err);
+			callback(0, err);
 		}
-		else if(doc!=null){
-			console.log("Data retrieved successfully!");
-			//res.sendFile(__dirname + environmentVariables.successfulMessage);
-			res.end("Success");
+		else if(err==null && item!=null){
+			console.log("LOGIN_DETAILS(SERVER)--> Data retrieved successfully! ");
+			callback(1, null);
 		}
-		else{
-			console.log("No such data");
-			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
-			res.end("Failure");
+		else if(err==null && item==null){
+			console.log("LOGIN_DETAILS(SERVER)--> No such data ");
+			callback(0, "No such data");	
 		}
 	});
 }
@@ -144,7 +139,7 @@ function removeFromDb(userName, password, res){
 exports.giveDbName = giveDbName;
 exports.startMongoServer = startMongoServer;
 exports.insertIntoLoginColl = insertIntoLoginColl;
-exports.findInDb = findInDb;
+exports.findInLoginDbForLoggingIn = findInLoginDbForLoggingIn;
 exports.updateDb = updateDb;
 exports.removeFromDb = removeFromDb;
 

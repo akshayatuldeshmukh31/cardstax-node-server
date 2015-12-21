@@ -78,20 +78,39 @@ app.post(environmentVariables.register, function(req,res){
 		else{
 			res.setHeader('Content-Type', 'application/json');
 			res.send(JSON.stringify({
-					"Success":"0",
-					"Error": err
+				"Success":"0",
+				"Error": err
 			}));
 			console.log("REGISTER(POST)--> Unsuccessful insertion of record with UID " + userId);
 		}
 	});
 });
 
-
+//For logging in existing users of the app
 app.post(environmentVariables.login, function(req,res){
-	userName = req.body.u_name;
-	password = req.body.pswd;
+	
+	var jsonObj = req.body;
+	console.log("LOGIN(POST)--> JSON received - " + JSON.stringify(jsonObj,null,2));
 
-	mongo.findInDb(userName, password, res);
+	//Search in the login collection
+	mongo.findInLoginDbForLoggingIn(jsonObj, function(result, err){
+		if(err){
+			console.log("LOGIN(POST)--> Username and password combination not found.");
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify({
+				"Success":"0",
+				"Error": err
+			}));
+		}
+		else{
+			console.log("LOGIN(POST)--> Username and password combination found.");
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify({
+				"Success":"1",
+				"Error": err
+			}));
+		}
+	});
 });
 
 app.post(environmentVariables.update, function(req,res){
