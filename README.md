@@ -1,6 +1,6 @@
 Work done till date - 
 
-(STATUS - UPDATED ON 22 DEC 2015!!!)
+(STATUS - NO CHANGE SINCE LAST COMMIT)
 1. Developed function for implementing the registration module on the server side for registering new users on the master and login collections. 
 
 	JSON Request key values:
@@ -28,7 +28,7 @@ Work done till date -
 
    PENDING! - Need to check the creation of session IDs and maintaining these session IDs.
 
-(STATUS - INCLUDED ON 22 DEC 2015)
+(STATUS - NO CHANGE SINCE LAST COMMIT)
 3. Developed function for updating the password of an existing user of the application
 
 	JSON Request key values:
@@ -40,11 +40,20 @@ Work done till date -
 		a. Success (String value of 0 or 1)
 		b. Error (Null if success is 1)
 
-*** NOTE ***
-1. URI for register - /register
-2. URI for login - /login
-3. URI for update - /update
+4. Developed function for deleting the account of the user from the server
 
+	JSON Request key values:
+		a. _id
+
+	JSON Response key values:
+		a. Success (String value of 0 or 1)
+		b. Error (Null if success is 1)
+
+*** NOTE ***
+1. URI for register - /register (HTTP METHOD - POST)
+2. URI for login - /logging		(HTTP METHOD - POST)
+3. URI for update - /update		(HTTP METHOD - PUT)
+4. URI for deletion - /remove	(HTTP METHOD - DELETE)
 
 Additionals -		
 1. Improved simple logging

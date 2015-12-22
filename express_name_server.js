@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 //*** Post/Put information in the form ***
 //For registering new users of the app
-app.post(environmentVariables.register, function(req,res){
+app.post(environmentVariables.registerNewLoginAccount, function(req,res){
 
 	var jsonObj = req.body;
 	console.log("REGISTER(POST)--> JSON received - " + JSON.stringify(jsonObj,null,2));
@@ -64,7 +64,7 @@ app.post(environmentVariables.register, function(req,res){
 					res.send(JSON.stringify({
 						"Success":"1",
 						"Error": err,
-						"_id": userId
+						"_id":userId
 					}));
 					console.log("REGISTER(POST)--> Successful insertion of record with UID " + userId);
 					updateIdFile();
@@ -89,7 +89,7 @@ app.post(environmentVariables.login, function(req,res){
 	console.log("LOGIN(POST)--> JSON received - " + JSON.stringify(jsonObj,null,2));
 
 	//Search in the login collection
-	mongo.findInLoginDb(jsonObj, function(result, err){
+	mongo.findInLoginColl(jsonObj, function(result, err){
 		if(err){
 			console.log("LOGIN(POST)--> Username and password combination not found.");
 			res.setHeader('Content-Type', 'application/json');
@@ -110,7 +110,7 @@ app.post(environmentVariables.login, function(req,res){
 });
 
 //For updating the login details(password only) of the user
-app.put(environmentVariables.update, function(req,res){
+app.put(environmentVariables.updateLoginAccount, function(req,res){
 	
 	var jsonObj = req.body;
 	console.log("UPDATE_LOGIN_DETAILS(PUT)--> JSON received - " + JSON.stringify(jsonObj,null,2));
@@ -124,7 +124,7 @@ app.put(environmentVariables.update, function(req,res){
 		"password": jsonObj.newPassword
 	}));
 	
-	mongo.updateLoginDb(jsonUpdateCriteria, jsonUpdatedPassword, function(result, err){
+	mongo.updateLoginColl(jsonUpdateCriteria, jsonUpdatedPassword, function(result, err){
 		if(err){
 			console.log("UPDATE_LOGIN_DETAILS(PUT)--> Password could not be updated.");
 			res.setHeader('Content-Type', 'application/json');
@@ -144,11 +144,48 @@ app.put(environmentVariables.update, function(req,res){
 	});	
 });
 
-app.post(environmentVariables.remove, function(req,res){
-	userName = req.body.u_name;
-	password = req.body.pswd;
-
-	mongo.removeFromDb(userName, password, res);
+app.delete(environmentVariables.removeLoginAccount, function(req,res){
+	
+	var jsonRemoveAccount = req.body;
+	console.log("REMOVE ACCOUNT(PUT)--> JSON received - " + JSON.stringify(jsonRemoveAccount,null,2));
+	
+	//Call to remove record from master collection of the server
+	mongo.removeFromMasterColl(jsonRemoveAccount, function(result, err){
+		console.log("REMOVE ACCOUNT(PUT)--> Result of deleting from login collection - " + result);
+		
+		if(err==null){
+			//Call to remove record from login collection of the server
+			mongo.removeFromLoginColl(jsonRemoveAccount, function(result, err){
+				console.log("REMOVE ACCOUNT(PUT)--> Result of deleting from master collection - " + result);
+				
+				//Sending a response to the request
+				if(err){
+					res.setHeader('Content-Type', 'application/json');
+					res.send(JSON.stringify({
+						"Success":"0",
+						"Error": err
+					}));
+					console.log("REMOVE ACCOUNT(PUT)--> Unsuccessful deletion of record with UID " + jsonRemoveAccount._id);
+				}
+				else{
+					res.setHeader('Content-Type', 'application/json');
+					res.send(JSON.stringify({
+						"Success":"1",
+						"Error": err
+					}));
+					console.log("REMOVE ACCOUNT(PUT)--> Successful deletion of record with UID " + jsonRemoveAccount._id);
+				}		
+			});	
+		}
+		else{
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify({
+				"Success":"0",
+				"Error": err
+			}));
+			console.log("REMOVE ACCOUNT(PUT)--> Unsuccessful deletion of record with UID " + jsonRemoveAccount._id);
+		}
+	});
 });
 
 //*** Stars server ***

@@ -82,7 +82,7 @@ function insertIntoMasterColl(jsonObjForMasterColl, callback){
 	});
 }
 
-function findInLoginDb(jsonObjForLoginColl, callback){
+function findInLoginColl(jsonObjForLoginColl, callback){
 	cursor = null;
 	loginCollection.findOne(jsonObjForLoginColl, function(err, item){
 		if(err){
@@ -100,7 +100,7 @@ function findInLoginDb(jsonObjForLoginColl, callback){
 	});
 }
 
-function updateLoginDb(jsonUpdateCriteria, jsonNewValue, callback){
+function updateLoginColl(jsonUpdateCriteria, jsonNewValue, callback){
 	loginCollection.updateOne(jsonUpdateCriteria,  {$set:jsonNewValue}, {w:1}, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
@@ -118,20 +118,38 @@ function updateLoginDb(jsonUpdateCriteria, jsonNewValue, callback){
 	});
 }
 
-function removeFromDb(userName, password, res){
-	loginCollection.deleteOne({"u_name": userName}, function(err,object){
+function removeFromLoginColl(jsonRemove, callback){
+	loginCollection.deleteOne(jsonRemove, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
-			console.log("Error in deleting data - "+err);
-			res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			console.log("LOGIN_DETAILS(DELETE)--> Error in deleting data - "+err);
+			callback(0, err);
 		}
 		else if(result.n==0){
-			console.log("No such data");
-			res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			console.log("LOGIN_DETAILS(DELETE)--> No such account (REMOVE)");
+			callback(0, "No such data");
 		}
 		else{
-			console.log("Data deleted successfully!");
-			res.sendFile(__dirname + environmentVariables.successfulMessage);
+			console.log("LOGIN_DETAILS(DELETE)--> Account deleted successfully! " + object);
+			callback(1, null);
+		}
+	});
+}
+
+function removeFromMasterColl(jsonRemove, callback){
+	masterCollection.deleteOne(jsonRemove, function(err,object){
+		var result = JSON.parse(object);
+		if(err){
+			console.log("LOGIN_DETAILS(DELETE)--> Error in deleting data - "+err);
+			callback(0, err);
+		}
+		else if(result.n==0){
+			console.log("LOGIN_DETAILS(DELETE)--> No such account (REMOVE)");
+			callback(0, "No such data");
+		}
+		else{
+			console.log("LOGIN_DETAILS(DELETE)--> Account deleted successfully! " + object);
+			callback(1, null);
 		}
 	});
 }
@@ -139,8 +157,9 @@ function removeFromDb(userName, password, res){
 exports.giveDbName = giveDbName;
 exports.startMongoServer = startMongoServer;
 exports.insertIntoLoginColl = insertIntoLoginColl;
-exports.findInLoginDb = findInLoginDb;
-exports.updateLoginDb = updateLoginDb;
-exports.removeFromDb = removeFromDb;
+exports.findInLoginColl = findInLoginColl;
+exports.updateLoginColl = updateLoginColl;
+exports.removeFromLoginColl = removeFromLoginColl;
 
 exports.insertIntoMasterColl = insertIntoMasterColl;
+exports.removeFromMasterColl = removeFromMasterColl;

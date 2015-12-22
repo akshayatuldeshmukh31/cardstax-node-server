@@ -3,10 +3,10 @@ mongoDbUri = "mongodb://localhost:27017/master_server";
 mongoLoginDetailsCollectionName = "login_details";
 mongoMasterCollectionName = "master_collection";
 
-register = "/register";
+registerNewLoginAccount = "/register";
 login = "/login";
-remove = "/remove";
-update = "/update";
+removeLoginAccount = "/remove";
+updateLoginAccount = "/update";
 
 successfulMessage = "/sc.html";
 unsuccessfulMessage = "/unsc.html";
@@ -16,10 +16,10 @@ exports.mongoDbUri = mongoDbUri;
 exports.mongoLoginDetailsCollectionName = mongoLoginDetailsCollectionName;
 exports.mongoMasterCollectionName = mongoMasterCollectionName;
 
-exports.register = register;
+exports.registerNewLoginAccount = registerNewLoginAccount;
 exports.login = login;
-exports.remove = remove;
-exports.update = update;
+exports.removeLoginAccount = removeLoginAccount;
+exports.updateLoginAccount = updateLoginAccount;
 
 exports.successfulMessage = successfulMessage;
 exports.unsuccessfulMessage = unsuccessfulMessage;
