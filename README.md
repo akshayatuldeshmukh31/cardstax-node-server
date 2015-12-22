@@ -17,7 +17,7 @@ Work done till date -
 	JSON Response key values:
 
 		a. Success (String value of 0 or 1)
-		b. Error (Null if success is 1)
+		b. Error (null if success is 1)
 		c. ID of the newly registered user (_id) - To be stored within the application for future correspondence with the server 
 
 
@@ -34,7 +34,7 @@ Work done till date -
 	JSON Response key values:
 
 		a. Success (String value of 0 or 1)
-		b. Error (Null if success is 1)
+		b. Error (null if success is 1)
 
    PENDING! - Need to check the creation of session IDs and maintaining these session IDs.
 
@@ -53,7 +53,7 @@ Work done till date -
 	JSON Response key values:
 
 		a. Success (String value of 0 or 1)
-		b. Error (Null if success is 1)
+		b. Error (null if success is 1)
 
 
 (STATUS - INCLUDED IN THIS COMMIT)
@@ -67,7 +67,7 @@ Work done till date -
 	JSON Response key values:
 
 		a. Success (String value of 0 or 1)
-		b. Error (Null if success is 1)
+		b. Error (null if success is 1)
 
 
 
