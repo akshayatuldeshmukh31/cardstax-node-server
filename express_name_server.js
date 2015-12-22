@@ -26,25 +26,20 @@ app.post(environmentVariables.register, function(req,res){
 	userId = fs.readFileSync("IdGenerator.txt", 'utf8');
 	
 	//For the login collection of the server
-	var jsonLoginTemp = JSON.stringify({
+	var jsonObjForLoginColl = JSON.parse(JSON.stringify({
 		"_id": userId,
 		"userName": jsonObj.userName,
 		"password": jsonObj.password,
 		"channel": jsonObj.channel
-	});
-
-	var jsonObjForLoginColl = JSON.parse(jsonLoginTemp);
+	}));
 	console.log("REGISTER(POST)--> JSON for login collection - " + JSON.stringify(jsonObjForLoginColl,null,2));
 
-	var jsonMasterTemp = JSON.stringify({
+	var jsonObjForMasterColl = JSON.parse(JSON.stringify({
 		"_id": userId,
 		"First_name": jsonObj.First_name,
 		"Last_name": jsonObj.Last_name
-	});
-
-	var jsonObjForMasterColl = JSON.parse(jsonMasterTemp);
+	}));
 	console.log("REGISTER(POST)--> JSON for master collection - " + JSON.stringify(jsonObjForMasterColl,null,2));
-	
 	
 	//Call to insert details into login collection of the server
 	mongo.insertIntoLoginColl(jsonObjForLoginColl, function(result, err){
@@ -68,7 +63,8 @@ app.post(environmentVariables.register, function(req,res){
 					res.setHeader('Content-Type', 'application/json');
 					res.send(JSON.stringify({
 						"Success":"1",
-						"Error": err
+						"Error": err,
+						"_id": userId
 					}));
 					console.log("REGISTER(POST)--> Successful insertion of record with UID " + userId);
 					updateIdFile();
@@ -93,7 +89,7 @@ app.post(environmentVariables.login, function(req,res){
 	console.log("LOGIN(POST)--> JSON received - " + JSON.stringify(jsonObj,null,2));
 
 	//Search in the login collection
-	mongo.findInLoginDbForLoggingIn(jsonObj, function(result, err){
+	mongo.findInLoginDb(jsonObj, function(result, err){
 		if(err){
 			console.log("LOGIN(POST)--> Username and password combination not found.");
 			res.setHeader('Content-Type', 'application/json');
@@ -113,11 +109,39 @@ app.post(environmentVariables.login, function(req,res){
 	});
 });
 
-app.post(environmentVariables.update, function(req,res){
-	userName = req.body.u_name;
-	password = req.body.pswd;
+//For updating the login details(password only) of the user
+app.put(environmentVariables.update, function(req,res){
+	
+	var jsonObj = req.body;
+	console.log("UPDATE_LOGIN_DETAILS(PUT)--> JSON received - " + JSON.stringify(jsonObj,null,2));
 
-	mongo.updateDb(userName, password, res);
+	var jsonUpdateCriteria = JSON.parse(JSON.stringify({
+		"_id": jsonObj._id,
+		"password": jsonObj.oldPassword
+	}));
+	
+	var jsonUpdatedPassword = JSON.parse(JSON.stringify({
+		"password": jsonObj.newPassword
+	}));
+	
+	mongo.updateLoginDb(jsonUpdateCriteria, jsonUpdatedPassword, function(result, err){
+		if(err){
+			console.log("UPDATE_LOGIN_DETAILS(PUT)--> Password could not be updated.");
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify({
+				"Success":"0",
+				"Error": err
+			}));
+		}
+		else{
+			console.log("UPDATE_LOGIN_DETAILS(PUT)--> Password has been successfully updated.");
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify({
+				"Success":"1",
+				"Error": err
+			}));
+		}
+	});	
 });
 
 app.post(environmentVariables.remove, function(req,res){

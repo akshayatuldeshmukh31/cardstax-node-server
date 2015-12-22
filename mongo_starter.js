@@ -82,7 +82,7 @@ function insertIntoMasterColl(jsonObjForMasterColl, callback){
 	});
 }
 
-function findInLoginDbForLoggingIn(jsonObjForLoginColl, callback){
+function findInLoginDb(jsonObjForLoginColl, callback){
 	cursor = null;
 	loginCollection.findOne(jsonObjForLoginColl, function(err, item){
 		if(err){
@@ -94,26 +94,26 @@ function findInLoginDbForLoggingIn(jsonObjForLoginColl, callback){
 			callback(1, null);
 		}
 		else if(err==null && item==null){
-			console.log("LOGIN_DETAILS(SERVER)--> No such data ");
+			console.log("LOGIN_DETAILS(SERVER)--> No such data (FIND)");
 			callback(0, "No such data");	
 		}
 	});
 }
 
-function updateDb(userName, password, res){
-	loginCollection.updateOne({"u_name": userName},  {$set:{"pswd": password}}, {w:1}, function(err,object){
+function updateLoginDb(jsonUpdateCriteria, jsonNewValue, callback){
+	loginCollection.updateOne(jsonUpdateCriteria,  {$set:jsonNewValue}, {w:1}, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
-			console.log("Error in updating data - "+err);
-			res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			console.log("LOGIN_DETAILS(PUT)--> Error in updating password - "+err);
+			callback(0, err);
 		}
 		else if(result.nModified==0){
-			console.log("No such data");
-			res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
+			console.log("LOGIN_DETAILS(PUT)--> No such data (UPDATE)");
+			callback(0, "No such data");
 		}
 		else{
-			console.log("Data updated successfully!"+ object + " "+result.n);
-			res.sendFile(__dirname + environmentVariables.successfulMessage);
+			console.log("LOGIN_DETAILS(PUT)--> Password updated successfully! "+ object);
+			callback(1, null);
 		}
 	});
 }
@@ -139,8 +139,8 @@ function removeFromDb(userName, password, res){
 exports.giveDbName = giveDbName;
 exports.startMongoServer = startMongoServer;
 exports.insertIntoLoginColl = insertIntoLoginColl;
-exports.findInLoginDbForLoggingIn = findInLoginDbForLoggingIn;
-exports.updateDb = updateDb;
+exports.findInLoginDb = findInLoginDb;
+exports.updateLoginDb = updateLoginDb;
 exports.removeFromDb = removeFromDb;
 
 exports.insertIntoMasterColl = insertIntoMasterColl;
