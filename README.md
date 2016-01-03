@@ -70,7 +70,15 @@ Work done till date -
 		b. Error (null if success is 1)
 
 
+*Developed logout function to check for Internet connectivity
 
+	JSON Request key values: None required
+
+	JSON Response key values:
+
+		a. Success (String value of 0 or 1)
+
+		
 *** NOTE ***
 
 1. URI for register - /register (HTTP METHOD - POST)
