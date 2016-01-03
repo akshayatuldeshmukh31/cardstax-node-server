@@ -7,6 +7,7 @@ registerNewLoginAccount = "/register";
 login = "/login";
 removeLoginAccount = "/remove";
 updateLoginAccount = "/update";
+logout = "/logout";
 
 successfulMessage = "/sc.html";
 unsuccessfulMessage = "/unsc.html";
@@ -20,6 +21,7 @@ exports.registerNewLoginAccount = registerNewLoginAccount;
 exports.login = login;
 exports.removeLoginAccount = removeLoginAccount;
 exports.updateLoginAccount = updateLoginAccount;
+exports.logout = logout;
 
 exports.successfulMessage = successfulMessage;
 exports.unsuccessfulMessage = unsuccessfulMessage;

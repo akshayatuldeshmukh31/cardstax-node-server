@@ -188,6 +188,12 @@ app.delete(environmentVariables.removeLoginAccount, function(req,res){
 	});
 });
 
+app.get(environmentVariables.logout, function(req, res){
+	res.send(JSON.stringify({
+		"Success":"1",
+	}));
+});
+
 //*** Stars server ***
 function startExpressServer(){
 	server = app.listen(environmentVariables.portNo, function(){
