@@ -189,9 +189,11 @@ app.delete(environmentVariables.removeLoginAccount, function(req,res){
 });
 
 app.get(environmentVariables.logout, function(req, res){
+	console.log("Received request to LOGOUT");
 	res.send(JSON.stringify({
 		"Success":"1",
 	}));
+	console.log("LOGOUT executed");
 });
 
 //*** Stars server ***

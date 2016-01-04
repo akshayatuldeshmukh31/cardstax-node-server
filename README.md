@@ -72,7 +72,9 @@ Work done till date -
 
 *Developed logout function to check for Internet connectivity
 
-	JSON Request key values: None required
+	JSON Request key values: 
+
+		None required
 
 	JSON Response key values:
 
@@ -88,6 +90,8 @@ Work done till date -
 3. URI for update - /update		(HTTP METHOD - PUT)
 
 4. URI for deletion - /remove	(HTTP METHOD - DELETE)
+
+5. URI for logout - /logout 	(HTTP METHOD - GET)
 
 
 
