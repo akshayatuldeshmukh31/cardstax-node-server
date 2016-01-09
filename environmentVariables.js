@@ -9,8 +9,10 @@ removeLoginAccount = "/remove";
 updateLoginAccount = "/update";
 logout = "/logout";
 
-successfulMessage = "/sc.html";
-unsuccessfulMessage = "/unsc.html";
+userCardOperation = "card";
+
+//AWS related variables
+profilePictureBucket = "mp-profile-picture";
 
 exports.portNo = portNo;
 exports.mongoDbUri = mongoDbUri;
@@ -23,5 +25,7 @@ exports.removeLoginAccount = removeLoginAccount;
 exports.updateLoginAccount = updateLoginAccount;
 exports.logout = logout;
 
-exports.successfulMessage = successfulMessage;
-exports.unsuccessfulMessage = unsuccessfulMessage;
+exports.userCardOperation = userCardOperation;
+
+//Export of AWS related variables
+exports.profilePictureBucket = profilePictureBucket;

@@ -1,11 +1,18 @@
-//Starts Express server
+/*
+	Consists of routing paths and processing of requests to create suitable responses.
+*/
 
 var mongo = require("./mongo_starter");
 var express = require("express");
+var AWS = require("aws-sdk");
+var uuid = require("node-uuid");
 var app = express();
-var fs = require("fs");
 var bodyParser = require("body-parser");
 var environmentVariables = require("./environmentVariables");
+var awsS3Method = require("./aws_s3_interface");
+
+//AWS configuration for testing purposes
+AWS.config.loadFromPath("./config.json");
 
 var server = null;
 var userId, userName, password, flag;
@@ -23,8 +30,8 @@ app.post(environmentVariables.registerNewLoginAccount, function(req,res){
 	var jsonObj = req.body;
 	console.log("REGISTER(POST)--> JSON received - " + JSON.stringify(jsonObj,null,2));
 
-	userId = fs.readFileSync("IdGenerator.txt", 'utf8');
-	
+	userId = uuid.v4();
+
 	//For the login collection of the server
 	var jsonObjForLoginColl = JSON.parse(JSON.stringify({
 		"_id": userId,
@@ -37,7 +44,8 @@ app.post(environmentVariables.registerNewLoginAccount, function(req,res){
 	var jsonObjForMasterColl = JSON.parse(JSON.stringify({
 		"_id": userId,
 		"First_name": jsonObj.First_name,
-		"Last_name": jsonObj.Last_name
+		"Last_name": jsonObj.Last_name,
+		"Version": 0
 	}));
 	console.log("REGISTER(POST)--> JSON for master collection - " + JSON.stringify(jsonObjForMasterColl,null,2));
 	
@@ -67,7 +75,6 @@ app.post(environmentVariables.registerNewLoginAccount, function(req,res){
 						"_id":userId
 					}));
 					console.log("REGISTER(POST)--> Successful insertion of record with UID " + userId);
-					updateIdFile();
 				}		
 			});	
 		}
@@ -188,12 +195,81 @@ app.delete(environmentVariables.removeLoginAccount, function(req,res){
 	});
 });
 
+//For logouts while checking for internet connectivity
 app.get(environmentVariables.logout, function(req, res){
 	console.log("Received request to LOGOUT");
 	res.send(JSON.stringify({
 		"Success":"1",
 	}));
 	console.log("LOGOUT executed");
+});
+
+
+//For updating the card details of the user
+app.put(environmentVariables.userCardOperation, function(req, res){
+
+	var jsonObj = req.body;
+
+	var jsonObjFindClause = JSON.parse(JSON.stringify({
+		"_id": jsonObj._id
+	}));
+
+	//TODO
+	/*
+		1. Is Changed_by required?
+		2. Separate images from the header
+	*/
+	var jsonObjUpdateClause = JSON.parse(JSON.stringify({
+		"First_name": jsonObj.First_name,
+		"Last_name": jsonObj.Last_name,
+		"Company": jsonObj.Company,
+		"Designation": jsonObj.Designation,
+		"Company_address": jsonObj.Company_address,
+		"Country": jsonObj.Country,
+		"Template_id": jsonObj.Template_id,
+		"Changed_on": jsonObj.Changed_on,
+		"Changed_by": jsonObj.Changed_by
+	}));
+
+	mongo.updateMasterColl(jsonObjFindClause, jsonObjUpdateClause, function(result, err){
+		if(result==1){
+			//TODO Operation to load profile and company pictures
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify({
+				"Success":"1",
+				"Error": err
+			}));
+		}
+		else{
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify({
+				"Success":"0",
+				"Error": err
+			}));
+		}	
+	});
+
+	//TODO awsS3Method.uploadProfilePicture();
+	//TODO awsS3Method.uploadCompanyLogo();
+});
+
+
+app.get("/aws_testing", function(req,res){
+	var s3 = new AWS.S3();
+	var params = {Bucket: 'mp-profile-picture', Key: 'trial', Body: 'Hello!'};
+
+	s3.putObject(params, function(err, data) {
+      if (err)       
+        console.log(err)     
+      else       
+      	console.log("Successfully uploaded data to myBucket/myKey");   
+   });
+
+	res.send("Test over!");
+});
+
+app.get("/test", function(req,res){
+	res.send("Connection ok");
 });
 
 //*** Stars server ***
@@ -204,29 +280,6 @@ function startExpressServer(){
 
 		console.log("Server is operational : "+host+" "+port);
 	});
-}
-
-//*** Generates a new ID number(UID) for every newly registered user ***
-function updateIdFile(){
-	fs.readFile('IdGenerator.txt', 'utf8', function(err,data){
-		if(err){
-			console.log(err);
-		}
-
-		data = parseInt(data, 10);
-		data += 1;
-		fs.truncate('IdGenerator.txt', 0, function(){
-		});
-
-		fs.writeFile('IdGenerator.txt', data, function(err){
-			if(err){
-				console.log("Data insertion error: "+data+" --> "+"IdGenerator.txt");
-			}
-		});
-	});
-
-
-
 }
 
 exports.startExpressServer = startExpressServer;

@@ -1,5 +1,8 @@
-//Starts MongoServer
-var exServer = require("./express_name_server");
+/*
+	Consists of methods related to CRUD operations of MongoDB.
+*/
+
+var exServer = require("./express_server");
 var mongodb = require("mongodb");
 var environmentVariables = require("./environmentVariables");
 var MongoClient = mongodb.MongoClient;
@@ -118,6 +121,24 @@ function updateLoginColl(jsonUpdateCriteria, jsonNewValue, callback){
 	});
 }
 
+function updateMasterColl(jsonUpdateCriteria, jsonNewValues, callback){
+	masterCollection.updateOne(jsonUpdateCriteria,  {$set:jsonNewValues}, {w:1}, function(err,object){
+		var result = JSON.parse(object);
+		if(err){
+			console.log("MASTER_COLLECTION(PUT)--> Error in updating user card details - "+err);
+			callback(0, err);
+		}
+		else if(result.nModified==0){
+			console.log("MASTER_COLLECTION(PUT)--> No such data (UPDATE)");
+			callback(0, "No such data");
+		}
+		else{
+			console.log("MASTER_COLLECTION(PUT)--> User card details updated successfully! "+ object);
+			callback(1, null);
+		}
+	});
+}
+
 function removeFromLoginColl(jsonRemove, callback){
 	loginCollection.deleteOne(jsonRemove, function(err,object){
 		var result = JSON.parse(object);
@@ -159,6 +180,7 @@ exports.startMongoServer = startMongoServer;
 exports.insertIntoLoginColl = insertIntoLoginColl;
 exports.findInLoginColl = findInLoginColl;
 exports.updateLoginColl = updateLoginColl;
+exports.updateMasterColl = updateMasterColl;
 exports.removeFromLoginColl = removeFromLoginColl;
 
 exports.insertIntoMasterColl = insertIntoMasterColl;

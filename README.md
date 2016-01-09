@@ -100,3 +100,7 @@ Additionals -
 1. Improved simple logging
 
 2. UID is automatically given a new value by an ID generator. Currently gives a new number as a new ID.
+
+3. AWSAccessKeyId = AKIAJOE6W23TWYYAHU2Q
+
+4. AWSSecretKey = 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
