@@ -66,8 +66,8 @@ Work done till date -
 
 	JSON Response key values:
 
-		a. Success (String value of 0 or 1)
-		b. Error (null if success is 1)
+		a. success (String value of 0 or 1)
+		b. error (null if success is 1)
 
    PENDING! - Need to check the creation of session IDs and maintaining these session IDs.
 
