@@ -1,0 +1,28 @@
+{
+  "name": "express-mongo-node-server",
+  "version": "1.0.0",
+  "description": "Node.js Express server with MongoDB database",
+  "author": "Akshay Atul Deshmukh (akshayatuldeshmukh31@gmail.com)",
+  "contributors": [
+    {
+      "name": "Dhiraj Minocha",
+      "email": "dhiraj.005in@gmail.com"
+    }
+  ],
+  "scripts": {
+    "start": "node main.js"
+  },
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://akshayd31@bitbucket.org/majorproject1/cardstax-node-server.git"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.2.28",
+    "body-parser": "^1.14.2",
+    "express": "^4.13.3",
+    "jsonwebtoken": "^5.5.4",
+    "mongodb": "^2.1.4",
+    "node-uuid": "^1.4.7"
+  }
+}

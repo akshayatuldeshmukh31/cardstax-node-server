@@ -105,6 +105,9 @@ publicRouter.post("/login", function(req,res){
 		}
 		else{
 			console.log("LOGIN --> Username and password combination found.");
+			
+			//TODO Code to implement JWT tokens
+
 			res.setHeader('Content-Type', 'application/json');
 			res.send(JSON.stringify({
 				"success":"1",
