@@ -10,6 +10,7 @@
 var expressServerInstanceProvider = require("./../server_starter");
 var bodyParser = require("body-parser");
 var publicRoutes = require("./public_access");
+var securedRoutes = require("./secured_access");
 
 //Function to load routes for publicly and privately accessible routes
 function loadAppRoutes(app){
@@ -23,7 +24,7 @@ function loadAppRoutes(app){
 	app.use("/public", publicRoutes);
 
 	//Load routes which require authorization (secured access)
-	//app.use("/secure", securedRoutes);
+	app.use("/secure", securedRoutes);
 
 	//TEST route
 	app.get("/", function(req,res){

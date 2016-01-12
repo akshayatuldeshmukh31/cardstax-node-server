@@ -30,15 +30,15 @@ function searchLoginDetails(jsonObjForLoginColl, callback){
 	loginCollection.findOne(jsonObjForLoginColl, function(err, item){
 		if(err){
 			console.log("LOGIN_DETAILS(SERVER)--> Error in finding data - "+err);
-			callback(0, err);
+			callback(0, item, err);
 		}
 		else if(err==null && item!=null){
 			console.log("LOGIN_DETAILS(SERVER)--> Data retrieved successfully! ");
-			callback(1, null);
+			callback(1, item, null);
 		}
 		else if(err==null && item==null){
 			console.log("LOGIN_DETAILS(SERVER)--> No such data (FIND)");
-			callback(0, "No such data");	
+			callback(0, item, null);	
 		}
 	});
 }
@@ -71,7 +71,7 @@ function deleteLoginDetails(jsonRemove, callback){
 
 	if(loginCollection == null)
 		loginCollection = serverInstance.returnLoginCollection();
-	
+
 	loginCollection.deleteOne(jsonRemove, function(err,object){
 		var result = JSON.parse(object);
 		if(err){

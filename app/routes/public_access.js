@@ -8,11 +8,13 @@
 	*********************************************************************************
 */
 
+var jwt = require("jsonwebtoken");
 var express = require("express");
 var publicRouter = express.Router();
 
 var userAccountMethods = require("./../interfaces/mongodb_accounts_interface");
 var cardMethods = require("./../interfaces/mongodb_cards_interface");
+var config = require("./../../config/config");
 
 var uuid = require("node-uuid");
 
@@ -94,24 +96,35 @@ publicRouter.post("/login", function(req,res){
 	console.log("LOGIN --> JSON received - " + JSON.stringify(jsonObj,null,2));
 
 	//Search in the login collection
-	userAccountMethods.searchLoginDetails(jsonObj, function(result, err){
+	userAccountMethods.searchLoginDetails(jsonObj, function(result, item, err){
+		
+		res.setHeader('Content-Type', 'application/json');
+		
 		if(err){
 			console.log("LOGIN --> Username and password combination not found.");
-			res.setHeader('Content-Type', 'application/json');
 			res.send(JSON.stringify({
 				"success":"0",
 				"error": err
+			}));
+		}
+		else if(!item){
+			res.send(JSON.stringify({
+				"success":"0",
+				"error": "Authentication failed!"
 			}));
 		}
 		else{
 			console.log("LOGIN --> Username and password combination found.");
 			
 			//TODO Code to implement JWT tokens
+			var token = jwt.sign(item, config.secret, {
+				expiresIn: 86400 //Expires in 24 hours
+			});
 
-			res.setHeader('Content-Type', 'application/json');
 			res.send(JSON.stringify({
 				"success":"1",
-				"error": err
+				"error": err,
+				"token": token
 			}));
 		}
 	});

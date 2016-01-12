@@ -101,15 +101,18 @@ Work done till date -
 
 
 
-*Developed logout function to check for Internet connectivity
+* Developed logout function to check for Internet connectivity
 
 	JSON Request key values: 
 
-		None required
+		a. None required
 
 	JSON Response key values:
 
 		a. Success (String value of 0 or 1)
+
+
+* Implemented test implementation of JSON Web Tokens (Authentication + Sessions). To be expanded and tested...
 
 		
 *** NOTE ***
