@@ -1,5 +1,5 @@
 portNo = 8888;
-mongoDbUri = "mongodb://localhost:27017/master_server";
+mongoDbUri = "mongodb://127.0.0.1:27017/master_server";
 mongoLoginDetailsCollectionName = "login_details";
 mongoMasterCollectionName = "master_collection";
 

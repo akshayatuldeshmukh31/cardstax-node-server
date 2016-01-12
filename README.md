@@ -1,28 +1,61 @@
+Current project structure:
+
+
+	-app
+
+	-----server_starter.js 						//Called by main.js. Contains functions to start the Express server and the MongoDB server.
+
+	-----status_codes.js
+
+	-----routes
+
+	----------index.js 							//Loads routes
+
+	----------public_access.js
+
+	----------secured_access.js
+
+	-----interfaces
+
+	----------mongodb_accounts_interface.js 	//Contains methods related to user accounts
+
+	----------mongodb_card_interface.js 		//Contains methods related to card details
+
+	----------amazons3.js
+
+	-config
+	
+	-----database.js
+
+	-----cloud.js
+
+	-package.json
+	
+	-main.js 									//Contains functions calls to start the Express server and the MongoDB server
+
+
+
 Work done till date - 
 
 
-
-(STATUS - NO CHANGE SINCE LAST COMMIT)
 
 * Developed function for implementing the registration module on the server side for registering new users on the master and login collections. 
 
 	JSON Request key values:
 
-		a. First_name
-		b. Last_name
+		a. firstName
+		b. lastName
 		c. userName
 		d. password
 		e. channel
 
 	JSON Response key values:
 
-		a. Success (String value of 0 or 1)
-		b. Error (null if success is 1)
+		a. success (String value of 0 or 1)
+		b. error (null if success is 1)
 		c. ID of the newly registered user (_id) - To be stored within the application for future correspondence with the server 
 
 
-
-(STATUS - NO CHANGE SINCE LAST COMMIT)
 
 * Developed function for logging in an existing user of the application
 
@@ -40,8 +73,6 @@ Work done till date -
 
 
 
-(STATUS - NO CHANGE SINCE LAST COMMIT)
-
 * Developed function for updating the password of an existing user of the application
 
 	JSON Request key values:
@@ -56,7 +87,6 @@ Work done till date -
 		b. Error (null if success is 1)
 
 
-(STATUS - INCLUDED IN THIS COMMIT)
 
 * Developed function for deleting the account of the user from the server
 
@@ -68,6 +98,7 @@ Work done till date -
 
 		a. Success (String value of 0 or 1)
 		b. Error (null if success is 1)
+
 
 
 *Developed logout function to check for Internet connectivity
