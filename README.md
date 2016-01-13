@@ -70,9 +70,6 @@ Work done till date -
 		a. success 
 		b. error 
 
-   PENDING! - Need to check the creation of session IDs and maintaining these session IDs.
-
-
 
 * Developed function for updating the password of an existing user of the application
 
