@@ -12,6 +12,7 @@
 
 var jwt = require("jsonwebtoken");
 var express = require("express");
+var AWS = require("aws-sdk");
 var secureRouter = express.Router();
 
 var userAccountMethods = require("./../interfaces/mongodb_accounts_interface");
@@ -146,34 +147,29 @@ secureRouter.get("/logout", function(req, res){
   console.log("LOGOUT executed");
 });
 
-/*
-  TODO Requires implementation of Amazon AWS functions
+
+//TODO Requires implementation of Amazon AWS functions
 secureRouter.put("/cards", function(req, res){
 
-  var jsonObj = req.body;
-
-  var jsonObjFindClause = JSON.parse(JSON.stringify({
-    "_id": jsonObj._id
+  var jsonUpdateCriteria = JSON.parse(JSON.stringify({
+    "_id": req.body._id
   }));
 
-  //TODO
+  //TODO Separate images from the header
   
-    1. Is Changed_by required?
-    2. Separate images from the header
-  
-  var jsonObjUpdateClause = JSON.parse(JSON.stringify({
-    "First_name": jsonObj.First_name,
-    "Last_name": jsonObj.Last_name,
-    "Company": jsonObj.Company,
-    "Designation": jsonObj.Designation,
-    "Company_address": jsonObj.Company_address,
-    "Country": jsonObj.Country,
-    "Template_id": jsonObj.Template_id,
-    "Changed_on": jsonObj.Changed_on,
-    "Changed_by": jsonObj.Changed_by
+  var jsonUpdateCard = JSON.parse(JSON.stringify({
+    "firstName": req.body.firstName,
+    "lastName": req.body.lastName,
+    "company": req.body.company,
+    "designation": req.body.designation,
+    "companyAddress": req.body.companyAddress,
+    "country": req.body.country,
+    "templateId": req.body.templateId,
+    "changedOn": req.body.changedOn,
+    "changedBy": req.body.changedBy
   }));
 
-  mongo.updateMasterColl(jsonObjFindClause, jsonObjUpdateClause, function(result, err){
+  mongo.updateMasterColl(jsonUpdateCriteria, jsonUpdateCard, function(result, err){
     if(result==1){
       //TODO Operation to load profile and company pictures
       res.setHeader('Content-Type', 'application/json');
@@ -195,7 +191,7 @@ secureRouter.put("/cards", function(req, res){
   //TODO awsS3Method.uploadCompanyLogo();
 });
 
-
+/*
 //TEST for AWS
 app.get("/aws_testing", function(req,res){
   var s3 = new AWS.S3();

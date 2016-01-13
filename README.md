@@ -63,7 +63,6 @@ Work done till date -
 
 		a. userName
 		b. password
-		c. token
 
 	JSON Response key values:
 
@@ -78,7 +77,6 @@ Work done till date -
 		a. _id
 		b. oldPassword (The old one)
 		c. newPassword (The new one)
-		d. token
 
 	JSON Response key values:
 
@@ -92,7 +90,6 @@ Work done till date -
 	JSON Request key values:
 
 		a. _id
-		b. token
 
 	JSON Response key values:
 
@@ -105,7 +102,7 @@ Work done till date -
 
 	JSON Request key values: 
 
-		a. token
+		a. Nothing
 
 	JSON Response key values:
 
@@ -113,13 +110,11 @@ Work done till date -
 		b. error
 
 
-* Implemented test implementation of JSON Web Tokens (Authentication + Sessions). To be expanded and tested...
+* Implemented test implementation of JSON Web Tokens (Authentication + Sessions). To be expanded and tested... (ATTENTION!!)
 
 	How tokens can be sent from the app:
 
-		a. As a JSON key-value pair in the request body
-
-		b. OR as a key-value pair in the request header with the key value as "x-access-token"
+		a. SEND TOKEN AS A KEY-VALUE PAIR IN THE REQUEST HEADER WITH THE KEY VALUE AS "x-access-token"
 
 
 *** STATUS CODES (RESPONSES AS RECEIVED BY THE APP) ***
