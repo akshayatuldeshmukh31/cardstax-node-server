@@ -27,6 +27,8 @@ Current project structure:
 	
 	-----config.js
 
+	-----environmentVariables.js
+
 	-package.json
 	
 	-main.js 									//Contains functions calls to start the Express server and the MongoDB server
