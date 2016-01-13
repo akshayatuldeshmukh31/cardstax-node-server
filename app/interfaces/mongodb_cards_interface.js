@@ -1,4 +1,5 @@
 var serverInstance = require("./../server_starter");
+var statusCodes = require("./../status_codes");
 var masterCollection = null;
 
 //To insert new user card details in the master collection during registration
@@ -10,13 +11,11 @@ function createCardDetails(jsonObjForMasterColl, callback){
 	masterCollection.insertOne(jsonObjForMasterColl, function(err,result){
 		if(err){
 			console.log("MASTER COLL(SERVER)--> Error in inserting data - "+err);
-			//res.sendFile(__dirname + environmentVariables.unsuccessfulMessage);
-			return callback(0, err);
+			return callback(statusCodes.operationError, err);
 		}
 		else if(result){
 			console.log("MASTER COLL(SERVER)--> Data entered successfully! " + result);
-			//res.sendFile(__dirname + environmentVariables.successfulMessage);
-			return callback(1, null);
+			return callback(statusCodes.operationSuccess, statusCodes.successMessage);
 		}
 	});
 }
@@ -30,15 +29,15 @@ function searchCardDetails(jsonObjForMasterColl, callback){
 	masterCollection.findOne(jsonObjForMasterColl, function(err, item){
 		if(err){
 			console.log("MASTER COLL --> Error in finding data - "+err);
-			callback(0, err);
+			return callback(statusCodes.operationError, err);
 		}
 		else if(err==null && item!=null){
 			console.log("MASTER COLL --> Data retrieved successfully! ");
-			callback(1, null);
+			return callback(statusCodes.operationSuccess, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){
 			console.log("MASTER COLL --> No such data (FIND)");
-			callback(0, "No such data");	
+			return callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErrorMessage);	
 		}
 	});
 }
@@ -53,19 +52,20 @@ function updateCardDetails(jsonUpdateCriteria, jsonNewValues, callback){
 		var result = JSON.parse(object);
 		if(err){
 			console.log("MASTER_COLLECTION(PUT)--> Error in updating user card details - "+err);
-			callback(0, err);
+			return callback(statusCodes.operationError, err);
 		}
 		else if(result.nModified==0){
 			console.log("MASTER_COLLECTION(PUT)--> No such data (UPDATE)");
-			callback(0, "No such data");
+			return callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErrorMessage);	
 		}
 		else{
 			console.log("MASTER_COLLECTION(PUT)--> User card details updated successfully! "+ object);
-			callback(1, null);
+			return callback(statusCodes.operationSuccess, statusCodes.successMessage);
 		}
 	});
 }
 
+/*
 //To update the status of card details of the user in the master collection in the event of a deletion of a card
 function deleteCardDetails(jsonRemove, callback){
 
@@ -88,9 +88,10 @@ function deleteCardDetails(jsonRemove, callback){
 		}
 	});
 }
+*/
 
 //Export functions to make it accessible for routes to call these functions
 exports.createCardDetails = createCardDetails;
 exports.searchCardDetails = searchCardDetails;
 exports.updateCardDetails = updateCardDetails;
-exports.deleteCardDetails = deleteCardDetails;
+//exports.deleteCardDetails = deleteCardDetails;

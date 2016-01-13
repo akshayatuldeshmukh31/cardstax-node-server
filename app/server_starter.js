@@ -9,7 +9,7 @@
 	*********************************************************************************
 */
 
-var environmentVariables = require("./../environmentVariables");
+var environmentVariables = require("./../config/environmentVariables");
 var config = require("./../config/config");
 var mongoAccountsInterface = require("./interfaces/mongodb_accounts_interface");
 var mongoCardsInterface = require("./interfaces/mongodb_cards_interface");

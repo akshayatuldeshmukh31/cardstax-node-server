@@ -11,9 +11,9 @@ Current project structure:
 
 	----------index.js 							//Loads routes
 
-	----------public_access.js
+	----------public_access.js 					//Routes which do not require any authentication
 
-	----------secured_access.js
+	----------secured_access.js 				//Routes which require authentication
 
 	-----interfaces
 
@@ -25,9 +25,7 @@ Current project structure:
 
 	-config
 	
-	-----database.js
-
-	-----cloud.js
+	-----config.js
 
 	-package.json
 	
@@ -51,8 +49,8 @@ Work done till date -
 
 	JSON Response key values:
 
-		a. success (String value of 0 or 1)
-		b. error (null if success is 1)
+		a. success 
+		b. error 
 		c. ID of the newly registered user (_id) - To be stored within the application for future correspondence with the server 
 
 
@@ -63,11 +61,12 @@ Work done till date -
 
 		a. userName
 		b. password
+		c. token
 
 	JSON Response key values:
 
-		a. success (String value of 0 or 1)
-		b. error (null if success is 1)
+		a. success 
+		b. error 
 
    PENDING! - Need to check the creation of session IDs and maintaining these session IDs.
 
@@ -80,52 +79,93 @@ Work done till date -
 		a. _id
 		b. oldPassword (The old one)
 		c. newPassword (The new one)
+		d. token
 
 	JSON Response key values:
 
-		a. Success (String value of 0 or 1)
-		b. Error (null if success is 1)
+		a. success 
+		b. error 
 
 
 
-* Developed function for deleting the account of the user from the server
+* Developed function for deleting the account of the user from the server (App is responsible for deleting the token from shared preferences after receiving the response from the server)
 
 	JSON Request key values:
 
 		a. _id
+		b. token
 
 	JSON Response key values:
 
-		a. Success (String value of 0 or 1)
-		b. Error (null if success is 1)
+		a. success 
+		b. error
 
 
 
-* Developed logout function to check for Internet connectivity
+* Developed logout function to check for Internet connectivity (App is responsible for deleting the token from shared preferences after receiving the response from the server)
 
 	JSON Request key values: 
 
-		a. None required
+		a. token
 
 	JSON Response key values:
 
-		a. Success (String value of 0 or 1)
+		a. success
+		b. error
 
 
 * Implemented test implementation of JSON Web Tokens (Authentication + Sessions). To be expanded and tested...
 
+
+*** STATUS CODES (RESPONSES AS RECEIVED BY THE APP) ***
+
+* Token Authorization
+
+	a. If success = "-1", then authorization has failed because either the token is damaged or your session has expired. (error = "Failed to authenticate token!")
+
+	b. If success = "0", then the app has forgotten to send a token. (error = "No token provided!")
+
+	c. You will not receive success as 1 if the authorization is successful. Your request will then be handled by server methods.
+
+* Database-related operations
+
+	a. Operation error will give:
+
+		i. success = "-1"
+
+		ii. error will be the error message given by MongoDB
+
+	b. No errors but the record does not exist
+
+		i. success = "0"
+
+		ii. error = "Data not found!"
+
+	c. No errors and the record exists
+
+		i. success = "1"
+
+		ii. error = null (not a string!!)
+
+
+*** STATUS CODES (FOR AUDIT PURPOSES) ***
+
+* status = "ALIVE" 	(Accounts which have been created)
+
+* status = "DEAD"	(Accounts which have been deleted and will never be used again)
+
 		
-*** NOTE ***
+*** URLs ***
 
-1. URI for register - /register (HTTP METHOD - POST)
+1. URI for register - /public/register 	(HTTP METHOD - POST)
 
-2. URI for login - /logging		(HTTP METHOD - POST)
+2. URI for login - /public/login		(HTTP METHOD - POST)
 
-3. URI for update - /update		(HTTP METHOD - PUT)
+3. URI for update - /secure/update		(HTTP METHOD - PUT)
 
-4. URI for deletion - /remove	(HTTP METHOD - DELETE)
+4. URI for deletion - /secure/remove	(HTTP METHOD - DELETE)
 
-5. URI for logout - /logout 	(HTTP METHOD - GET)
+5. URI for logout - /secure/logout 		(HTTP METHOD - GET)
 
 
 
@@ -138,3 +178,5 @@ Additionals -
 3. AWSAccessKeyId = AKIAJOE6W23TWYYAHU2Q
 
 4. AWSSecretKey = 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
+
+

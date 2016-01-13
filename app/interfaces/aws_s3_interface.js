@@ -3,7 +3,7 @@
 */
 
 var AWS = require("aws-sdk");
-var environmentVariables = require("./environmentVariables");
+var environmentVariables = require("./../../config/environmentVariables");
 
 //AWS configuration
 AWS.config.loadFromPath("./config.json");
