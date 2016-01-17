@@ -1,13 +1,13 @@
 Current project structure:
 
 
-	-app
+	-/app
 
 	-----server_starter.js 						//Called by main.js. Contains functions to start the Express server and the MongoDB server.
 
 	-----status_codes.js
 
-	-----routes
+	-----/routes
 
 	----------index.js 							//Loads routes
 
@@ -15,17 +15,21 @@ Current project structure:
 
 	----------secured_access.js 				//Routes which require authentication
 
-	-----interfaces
+	-----/interfaces
 
 	----------mongodb_accounts_interface.js 	//Contains methods related to user accounts
 
 	----------mongodb_card_interface.js 		//Contains methods related to card details
 
-	----------amazons3.js
+	----------amazon_s3_interface.js
 
-	-config
+	-----/uploads
+
+	-/config
 	
 	-----config.js
+
+	-----config.json
 
 	-----environmentVariables.js
 
@@ -71,7 +75,12 @@ Work done till date -
 		c. ID of the logged in user (_id)
 
 
+
 * Developed function for updating the password of an existing user of the application
+
+	HTTP header key values:
+
+		a. x-access-token
 
 	JSON Request key values:
 
@@ -87,6 +96,10 @@ Work done till date -
 
 
 * Developed function for deleting the account of the user from the server (App is responsible for deleting the token from shared preferences after receiving the response from the server)
+
+	HTTP header key values:
+
+		a. x-access-token
 
 	JSON Request key values:
 
@@ -111,11 +124,32 @@ Work done till date -
 		b. error
 
 
+
+* Developed endpoints to save card details of the user. This endpoint is activated when a user clicks on the SAVE button after making changes to his/her card. The functions take care of profile picture and company logo uploads into Amazon S3.
+
+	HTTP header key values:
+
+		a. x-access-token
+
+	form-data Request key values:
+
+		a. savedCardDetails (string; convert JSON to string using toString())
+		b. profilePic (Profile picture image file)
+		c. companyLogo (Company logo image file)
+
+	JSON Response key values:
+
+		a. success
+		b. error
+
+
+
 * Implemented test implementation of JSON Web Tokens (Authentication + Sessions). To be expanded and tested... (ATTENTION!!)
 
 	How tokens can be sent from the app:
 
 		a. SEND TOKEN AS A KEY-VALUE PAIR IN THE REQUEST HEADER WITH THE KEY VALUE AS "x-access-token"
+
 
 
 *** STATUS CODES (RESPONSES AS RECEIVED BY THE APP) ***
@@ -149,11 +183,13 @@ Work done till date -
 		ii. error = null (not a string!!)
 
 
+
 *** STATUS CODES (FOR AUDIT PURPOSES) ***
 
 * status = "ALIVE" 	(Accounts which have been created)
 
 * status = "DEAD"	(Accounts which have been deleted and will never be used again)
+
 
 		
 *** URLs ***
@@ -168,6 +204,8 @@ Work done till date -
 
 5. URI for logout - /secure/logout 		(HTTP METHOD - GET)
 
+6. URI for saving card details - /secure/cards (HTTP METHOD - PUT)
+
 
 
 Additionals -		
@@ -179,8 +217,3 @@ Additionals -
 3. AWSAccessKeyId = AKIAJOE6W23TWYYAHU2Q
 
 4. AWSSecretKey = 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
-
-
-056462c2-7295-426d-9e35-69686d01d683
-
-eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiIwNTY0NjJjMi03Mjk1LTQyNmQtOWUzNS02OTY4NmQwMWQ2ODMiLCJ1c2VyTmFtZSI6InNvbG9yZXR1cm5zIiwicGFzc3dvcmQiOiI0NmVjYmVjNWVjNzk1MWNlMTAyNjcwZGJkMGIyZGVmNSIsImNoYW5uZWwiOiJBbmRyb2lkIiwic3RhdHVzIjoiQUxJVkUiLCJpYXQiOjE0NTI3MTI1ODQsImV4cCI6MTQ1Mjc5ODk4NH0.mP59ioZyhnTlyx_9L4b3xIWHDt9DwPvDdrDrDD58QeM

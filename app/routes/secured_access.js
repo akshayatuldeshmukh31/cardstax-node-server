@@ -12,13 +12,10 @@
 
 var jwt = require("jsonwebtoken");
 var express = require("express");
-var AWS = require("aws-sdk");
 var formidable = require("formidable");
 var path = require("path");
 var fs = require("fs");
 var secureRouter = express.Router();
-
-var awsConfig = require("./../../config/aws_config.json");
 
 var userAccountMethods = require("./../interfaces/mongodb_accounts_interface");
 var cardMethods = require("./../interfaces/mongodb_cards_interface");
@@ -186,12 +183,22 @@ secureRouter.put("/cards", function(req, res){
     }));
 
     cardMethods.updateCardDetails(jsonFindCard, jsonUpdateCard, function(result, message, mongoRes){
-      if(message)
+      if(message){
         console.log("Encountered error while updating card details of user id " + jsonSavedCard._id);
+        res.send(JSON.stringify({
+          "success": result,
+          "error": message
+        }));
+      }
       else if(message==null){
         cardMethods.searchCardDetails(jsonFindCard, function(result, item, message){
-          if(message)
+          if(message){
             console.log("Encounterd error while trying to retrieve version of the user id " + jsonSavedCard._id);
+            res.send(JSON.stringify({
+              "success": result,
+              "error": message
+            }));
+          }
           else if(message==null){
 
             //If data exists and there are changes made to it
@@ -200,36 +207,74 @@ secureRouter.put("/cards", function(req, res){
                 "version": item.version + 1
               }));
               cardMethods.updateCardDetails(jsonFindCard, jsonUpdateVersion, function(result, message, mongoRes){
-                if(message)
+                if(message){
                   console.log("Encountered an error while updating version for user id " + jsonSavedCard._id);
-                else if(message==null)
-                  console.log("Successful save of cards for user id " + jsonSavedCard._id);
+                  res.send(JSON.stringify({
+                    "success": result,
+                    "error": message
+                  }));
+                }
+                else if(message==null){
+                  console.log("Successful save of cards with change in version for user id " + jsonSavedCard._id);
+
+                  //Call function for profile picture upload
+                  prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
+                    if(message){
+                      console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                      res.send(JSON.stringify({
+                        "success": result,
+                        "error": message
+                      }));
+                    }
+                    else{
+                      console.log("Successful upload of profile picture for " + files.profilePic.name);
+
+                      //Call function for company logo upload
+                      prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
+                        if(message)
+                          console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                        else
+                          console.log("Successful upload of company logo for " + files.companyLogo.name);
+                      
+                        res.send(JSON.stringify({
+                          "success": result,
+                          "error": message
+                        }));
+                      });
+                    }
+                  });
+                }
               });
             }
-            else
+            else{
               console.log("Successful save of cards without change in version for user id " + jsonSavedCard._id);
+              //Call function for profile picture upload
+              prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
+                if(message){
+                  console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                  res.send(JSON.stringify({
+                    "success": result,
+                    "error": message
+                  }));
+                }
+                else{
+                  console.log("Successful upload of profile picture for " + files.profilePic.name);
 
-            var profilePicPath = files.profilePic.path;
-            var profilePicExt = files.profilePic.name.split('.').pop();
-            
-            var profilePicIndex = null;
-            profilePicIndex = profilePicPath.lastIndexOf("\\") + 1;
-            if(profilePicIndex==null)
-              profilePicIndex = profilePicPath.lastIndexOf("/") + 1;
-
-            var profilePicNewPath = path.join(__dirname + "/../uploads/" + jsonSavedCard._id + '.' + profilePicExt);
-            var profilePicName = jsonSavedCard._id + '.' + profilePicExt; 
-
-            console.log("Old path - " + profilePicPath);
-            console.log("New path - " + profilePicNewPath);
-            fs.rename(profilePicPath, profilePicNewPath, function(err){
-              if(err)
-                console.log("Profile picture renaming error - " + err);
-              console.log("Picture renamed");
-            });
-            
-            console.log(files.profilePic.type);
-            amazonS3Methods.uploadProfilePicture(profilePicNewPath, profilePicName, files.profilePic.type);
+                  //Call function for company logo upload
+                  prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
+                    if(message)
+                      console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                    else
+                      console.log("Successful upload of company logo for " + files.companyLogo.name);
+                      
+                    res.send(JSON.stringify({
+                      "success": result,
+                      "error": message
+                    }));
+                  });
+                }
+              });
+            }  
           }
         });
       }
@@ -237,27 +282,70 @@ secureRouter.put("/cards", function(req, res){
   });
 });
 
-AWS.config.loadFromPath(__dirname + "./../../config/aws_config.json");
+//Function to parse file as preparation for storing in S3
+function prepareForProfileImageUpload(profilePic, id, callback){
+  
+  var profilePicPath = profilePic.path;
+  var profilePicExt = profilePic.name.split('.').pop();
+  var profilePicIndex = null;
+  profilePicIndex = profilePicPath.lastIndexOf("\\") + 1;
+  if(profilePicIndex==null)
+    profilePicIndex = profilePicPath.lastIndexOf("/") + 1;
+  var profilePicName = id + '-profile.' + profilePicExt; 
+  var profilePicNewPath = path.join(__dirname + "/../uploads/" + profilePicName);
+  
+  console.log("Profile picture old path - " + profilePicPath);          
+  fs.rename(profilePicPath, profilePicNewPath, function(err){
+    if(err){
+      console.log("Profile picture renaming error - " + err);
+      return callback(statusCodes.operationError, err);
+    }
+    else{
+      console.log("Profile picture renamed");
+      amazonS3Methods.uploadProfilePicture(profilePicNewPath, profilePicName, profilePic.type, function(result, message){
+        if(message)
+          console.log("Error in uploading profile picture for " + profilePicName);
+        else
+          console.log("Profile picture uploaded successfully for " + profilePicName);
 
-//TEST for AWS
-secureRouter.get("/aws_testing", function(req,res){
-  var s3 = new AWS.S3();
-  var params = {Bucket: 'mp-profile-picture', Key: 'trial', Body: 'Hello!'};
+        return callback(result, message);
+      });
+    }
+  });
+}
 
-  s3.putObject(params, function(err, data) {
-      if (err)       
-        console.log(err)     
-      else       
-        console.log("Successfully uploaded data to myBucket/myKey");   
-   });
 
-  res.send("Test over!");
-});
+//Function to parse file as preparation for storing in S3
+function prepareForCompanyLogoUpload(companyLogo, id, callback){
+  
+  var companyLogoPath = companyLogo.path;
+  var companyLogoExt = companyLogo.name.split('.').pop();
+  var companyLogoIndex = null;
+  companyLogoIndex = companyLogoPath.lastIndexOf("\\") + 1;
+  if(companyLogoIndex==null)
+    companyLogoIndex = companyLogoPath.lastIndexOf("/") + 1;
+  var companyLogoName = id + '-company.' + companyLogoExt; 
+  var companyLogoNewPath = path.join(__dirname + "/../uploads/" + companyLogoName);
+  
+  console.log("Company logo old path - " + companyLogoPath);   
+  fs.rename(companyLogoPath, companyLogoNewPath, function(err){
+    if(err){
+      console.log("Company logo renaming error - " + err);
+      return callback(statusCodes.operationError, err);
+    }
+    else{
+      console.log("Company logo renamed");
+      amazonS3Methods.uploadCompanyLogo(companyLogoNewPath, companyLogoName, companyLogo.type, function(result, message){
+        if(message)
+          console.log("Error in uploading company logo for " + companyLogoName);
+        else
+          console.log("Company logo uploaded successfully for " + companyLogoName);
 
-//TEST route
-secureRouter.get("/test", function(req, res){
-	res.send("Welcome to our secure site!");
-});
+        return callback(result, message);
+      });
+    }
+  });
+}
 
 module.exports = secureRouter;
 

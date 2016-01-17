@@ -16,8 +16,8 @@ exports.authenticationFailureErrorMessage = "Failed to authenticate token!";
 exports.authenticationTokenNotProvided = "0";
 exports.authenticationTokenNotProvidedErrorMessage = "No token provided!";
 
-//For MongoDB operations
-exports.operationError = "-1";							//Error on Mongo's side
+//For MongoDB/File operations
+exports.operationError = "-1";							//Error on Mongo's side (applies to files)
 exports.dataNotFound = "0";								//No error but the details do not exist
 exports.dataNotFoundErrorMessage = "Data not found!";
 exports.operationSuccess = "1";							//Operation was executed smoothly
