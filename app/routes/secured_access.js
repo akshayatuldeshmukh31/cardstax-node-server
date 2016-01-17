@@ -13,10 +13,16 @@
 var jwt = require("jsonwebtoken");
 var express = require("express");
 var AWS = require("aws-sdk");
+var formidable = require("formidable");
+var path = require("path");
+var fs = require("fs");
 var secureRouter = express.Router();
+
+var awsConfig = require("./../../config/aws_config.json");
 
 var userAccountMethods = require("./../interfaces/mongodb_accounts_interface");
 var cardMethods = require("./../interfaces/mongodb_cards_interface");
+var amazonS3Methods = require("./../interfaces/aws_s3_interface");
 var config = require("./../../config/config");
 var statusCodes = require("./../status_codes");
 
@@ -104,7 +110,7 @@ secureRouter.delete("/remove", function(req,res){
   }));
   
   //Call to remove record from master collection of the server
-  cardMethods.updateCardDetails(jsonUpdateCriteria, jsonUpdatedStatus, function(result, message){
+  cardMethods.updateCardDetails(jsonUpdateCriteria, jsonUpdatedStatus, function(result, message, mongoRes){
     
     res.setHeader('Content-Type', 'application/json');
     console.log("REMOVE ACCOUNT(PUT)--> Result of updating status in login collection - " + result);
@@ -151,49 +157,90 @@ secureRouter.get("/logout", function(req, res){
 //TODO Requires implementation of Amazon AWS functions
 secureRouter.put("/cards", function(req, res){
 
-  var jsonUpdateCriteria = JSON.parse(JSON.stringify({
-    "_id": req.body._id
-  }));
+  //Preparation to recieve multipart form-data
+  var form = new formidable.IncomingForm();
+  form.uploadDir = __dirname + "/../uploads";
+  var jsonSavedCard;
 
-  //TODO Separate images from the header
-  
-  var jsonUpdateCard = JSON.parse(JSON.stringify({
-    "firstName": req.body.firstName,
-    "lastName": req.body.lastName,
-    "company": req.body.company,
-    "designation": req.body.designation,
-    "companyAddress": req.body.companyAddress,
-    "country": req.body.country,
-    "templateId": req.body.templateId,
-    "changedOn": req.body.changedOn,
-    "changedBy": req.body.changedBy
-  }));
+  res.setHeader('Content-Type', 'application/json');
+  form.parse(req, function(error, fields, files) {
+    
+    //Field for new card details
+    jsonSavedCard = JSON.parse(fields.savedCardDetails);
+    console.log("Received JSON data - " + JSON.stringify(jsonSavedCard, null, 2));
 
-  mongo.updateMasterColl(jsonUpdateCriteria, jsonUpdateCard, function(result, err){
-    if(result==1){
-      //TODO Operation to load profile and company pictures
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify({
-        "Success":"1",
-        "Error": err
-      }));
-    }
-    else{
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify({
-        "Success":"0",
-        "Error": err
-      }));
-    } 
+    var jsonUpdateCard = JSON.parse(JSON.stringify({
+    "firstName": jsonSavedCard.firstName,
+    "lastName": jsonSavedCard.lastName,
+    "company": jsonSavedCard.company,
+    "designation": jsonSavedCard.designation,
+    "companyAddress": jsonSavedCard.companyAddress,
+    "country": jsonSavedCard.country,
+    "templateId": jsonSavedCard.templateId,
+    "changedOn": jsonSavedCard.changedOn,
+    "changedBy": jsonSavedCard.changedBy
+    }));
+
+    var jsonFindCard = JSON.parse(JSON.stringify({
+      "_id": jsonSavedCard._id
+    }));
+
+    cardMethods.updateCardDetails(jsonFindCard, jsonUpdateCard, function(result, message, mongoRes){
+      if(message)
+        console.log("Encountered error while updating card details of user id " + jsonSavedCard._id);
+      else if(message==null){
+        cardMethods.searchCardDetails(jsonFindCard, function(result, item, message){
+          if(message)
+            console.log("Encounterd error while trying to retrieve version of the user id " + jsonSavedCard._id);
+          else if(message==null){
+
+            //If data exists and there are changes made to it
+            if(mongoRes.n!=0 && mongoRes.nModified!=0){
+              var jsonUpdateVersion = JSON.parse(JSON.stringify({
+                "version": item.version + 1
+              }));
+              cardMethods.updateCardDetails(jsonFindCard, jsonUpdateVersion, function(result, message, mongoRes){
+                if(message)
+                  console.log("Encountered an error while updating version for user id " + jsonSavedCard._id);
+                else if(message==null)
+                  console.log("Successful save of cards for user id " + jsonSavedCard._id);
+              });
+            }
+            else
+              console.log("Successful save of cards without change in version for user id " + jsonSavedCard._id);
+
+            var profilePicPath = files.profilePic.path;
+            var profilePicExt = files.profilePic.name.split('.').pop();
+            
+            var profilePicIndex = null;
+            profilePicIndex = profilePicPath.lastIndexOf("\\") + 1;
+            if(profilePicIndex==null)
+              profilePicIndex = profilePicPath.lastIndexOf("/") + 1;
+
+            var profilePicNewPath = path.join(__dirname + "/../uploads/" + jsonSavedCard._id + '.' + profilePicExt);
+            var profilePicName = jsonSavedCard._id + '.' + profilePicExt; 
+
+            console.log("Old path - " + profilePicPath);
+            console.log("New path - " + profilePicNewPath);
+            fs.rename(profilePicPath, profilePicNewPath, function(err){
+              if(err)
+                console.log("Profile picture renaming error - " + err);
+              console.log("Picture renamed");
+            });
+            
+            console.log(files.profilePic.type);
+            amazonS3Methods.uploadProfilePicture(profilePicNewPath, profilePicName, files.profilePic.type);
+          }
+        });
+      }
+    });
   });
-
-  //TODO awsS3Method.uploadProfilePicture();
-  //TODO awsS3Method.uploadCompanyLogo();
 });
 
-/*
+AWS.config.loadFromPath(__dirname + "./../../config/aws_config.json");
+
 //TEST for AWS
-app.get("/aws_testing", function(req,res){
+secureRouter.get("/aws_testing", function(req,res){
   var s3 = new AWS.S3();
   var params = {Bucket: 'mp-profile-picture', Key: 'trial', Body: 'Hello!'};
 
@@ -206,7 +253,6 @@ app.get("/aws_testing", function(req,res){
 
   res.send("Test over!");
 });
-*/
 
 //TEST route
 secureRouter.get("/test", function(req, res){

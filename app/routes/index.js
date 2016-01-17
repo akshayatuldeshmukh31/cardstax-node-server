@@ -18,7 +18,7 @@ function loadAppRoutes(app){
 	app.use(bodyParser.json());
 
 	//To support URL-encoded bodies
-	app.use(bodyParser.urlencoded({extended:true}));
+	//app.use(bodyParser.urlencoded({extended:true}));
 
 	//Load routes which require no authorization (publicly available)
 	app.use("/public", publicRoutes);

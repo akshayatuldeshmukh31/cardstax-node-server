@@ -68,6 +68,7 @@ Work done till date -
 
 		a. success 
 		b. error 
+		c. ID of the logged in user (_id)
 
 
 * Developed function for updating the password of an existing user of the application
@@ -180,3 +181,6 @@ Additionals -
 4. AWSSecretKey = Qv9ABQkBDFUwWWIlMlrOswFhUkoIvoJThzPsUTZZ
 
 
+056462c2-7295-426d-9e35-69686d01d683
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiIwNTY0NjJjMi03Mjk1LTQyNmQtOWUzNS02OTY4NmQwMWQ2ODMiLCJ1c2VyTmFtZSI6InNvbG9yZXR1cm5zIiwicGFzc3dvcmQiOiI0NmVjYmVjNWVjNzk1MWNlMTAyNjcwZGJkMGIyZGVmNSIsImNoYW5uZWwiOiJBbmRyb2lkIiwic3RhdHVzIjoiQUxJVkUiLCJpYXQiOjE0NTI3MTI1ODQsImV4cCI6MTQ1Mjc5ODk4NH0.mP59ioZyhnTlyx_9L4b3xIWHDt9DwPvDdrDrDD58QeM

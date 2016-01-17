@@ -29,15 +29,15 @@ function searchCardDetails(jsonObjForMasterColl, callback){
 	masterCollection.findOne(jsonObjForMasterColl, function(err, item){
 		if(err){
 			console.log("MASTER COLL --> Error in finding data - "+err);
-			return callback(statusCodes.operationError, err);
+			return callback(statusCodes.operationError, item, err);
 		}
 		else if(err==null && item!=null){
 			console.log("MASTER COLL --> Data retrieved successfully! ");
-			return callback(statusCodes.operationSuccess, statusCodes.successMessage);
+			return callback(statusCodes.operationSuccess, item, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){
 			console.log("MASTER COLL --> No such data (FIND)");
-			return callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErrorMessage);	
+			return callback(statusCodes.dataNotFound, item, statusCodes.dataNotFoundErrorMessage);	
 		}
 	});
 }
@@ -52,22 +52,22 @@ function updateCardDetails(jsonUpdateCriteria, jsonNewValues, callback){
 		var result = JSON.parse(object);
 		if(err){
 			console.log("MASTER_COLLECTION(PUT)--> Error in updating user card details - "+err);
-			return callback(statusCodes.operationError, err);
+			return callback(statusCodes.operationError, err, result);
 		}
-		else if(result.nModified==0){
-			console.log("MASTER_COLLECTION(PUT)--> No such data (UPDATE)");
-			return callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErrorMessage);	
+		else if(result.n==0){
+			console.log("MASTER_COLLECTION(PUT)--> No such data (UPDATE) " + object);
+			return callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErrorMessage, result);	
 		}
 		else{
 			console.log("MASTER_COLLECTION(PUT)--> User card details updated successfully! "+ object);
-			return callback(statusCodes.operationSuccess, statusCodes.successMessage);
+			return callback(statusCodes.operationSuccess, statusCodes.successMessage, result);
 		}
 	});
 }
 
 /*
 //To update the status of card details of the user in the master collection in the event of a deletion of a card
-function deleteCardDetails(jsonRemove, callback){
+function deleteCardDetails(jsonId, callback){
 
 	if(masterCollection == null)
 		masterCollection = serverInstance.returnMasterCollection();

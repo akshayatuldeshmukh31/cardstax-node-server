@@ -10,6 +10,11 @@
 
 var jwt = require("jsonwebtoken");
 var express = require("express");
+var formidable = require("formidable");
+var util = require("util");
+var bodyParser = require("body-parser");
+var fs = require("fs");
+var path = require("path");
 var publicRouter = express.Router();
 
 var userAccountMethods = require("./../interfaces/mongodb_accounts_interface");
@@ -18,6 +23,8 @@ var config = require("./../../config/config");
 var statusCodes = require("./../status_codes");
 
 var uuid = require("node-uuid");
+
+publicRouter.use(bodyParser.urlencoded({extended:false}));
 
 //TEST route
 publicRouter.get("/", function(req, res){
@@ -128,10 +135,12 @@ publicRouter.post("/login", function(req,res){
 				expiresIn: 86400 //Expires in 24 hours
 			});
 
+			res.setHeader('x-access-token', token);
 			res.send(JSON.stringify({
 				"success": result,
 				"error": message,
-				"token": token
+				"token": token,
+				"_id": item._id
 			}));
 		}
 	});

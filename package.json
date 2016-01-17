@@ -20,9 +20,15 @@
   "dependencies": {
     "aws-sdk": "^2.2.28",
     "body-parser": "^1.14.2",
+    "connect-form": "^0.2.1",
     "express": "^4.13.3",
+    "formidable": "^1.0.17",
+    "http": "0.0.0",
     "jsonwebtoken": "^5.5.4",
     "mongodb": "^2.1.4",
-    "node-uuid": "^1.4.7"
+    "multer": "^1.1.0",
+    "node-uuid": "^1.4.7",
+    "path": "^0.12.7",
+    "util": "^0.10.3"
   }
 }

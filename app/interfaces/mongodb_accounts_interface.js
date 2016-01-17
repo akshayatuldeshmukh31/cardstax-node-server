@@ -32,7 +32,7 @@ function searchLoginDetails(jsonObjForLoginColl, callback){
 			callback(statusCodes.operationError, item, err);
 		}
 		else if(err==null && item!=null){
-			console.log("LOGIN_DETAILS(SERVER)--> Data retrieved successfully!");
+			console.log("LOGIN_DETAILS(SERVER)--> Data retrieved successfully! ");
 			callback(statusCodes.operationSuccess, item, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){
@@ -54,7 +54,7 @@ function updateLoginDetails(jsonUpdateCriteria, jsonNewValue, callback){
 			console.log("LOGIN_DETAILS(PUT)--> Error in updating password - "+err);
 			callback(statusCodes.operationError, err);
 		}
-		else if(result.nModified==0){
+		else if(result.n==0){
 			console.log("LOGIN_DETAILS(PUT)--> No such data (UPDATE)");
 			callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErroMessage);	
 		}
