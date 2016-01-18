@@ -45,6 +45,10 @@ Work done till date -
 
 * Developed function for implementing the registration module on the server side for registering new users on the master and login collections. 
 
+	HTTP header key values:
+
+		a. Content-Type = application/json
+
 	JSON Request key values:
 
 		a. firstName
@@ -63,6 +67,10 @@ Work done till date -
 
 * Developed function for logging in an existing user of the application
 
+	HTTP header key values:
+
+		a. Content-Type = application/json
+
 	JSON Request key values:
 
 		a. userName
@@ -80,7 +88,8 @@ Work done till date -
 
 	HTTP header key values:
 
-		a. x-access-token
+		a. Content-Type = application/json
+		b. x-access-token
 
 	JSON Request key values:
 
@@ -99,7 +108,8 @@ Work done till date -
 
 	HTTP header key values:
 
-		a. x-access-token
+		a. Content-Type = application/json
+		b. x-access-token
 
 	JSON Request key values:
 
@@ -130,6 +140,7 @@ Work done till date -
 	HTTP header key values:
 
 		a. x-access-token
+		b. Do not add Content-Type
 
 	form-data Request key values:
 
@@ -194,17 +205,17 @@ Work done till date -
 		
 *** URLs ***
 
-1. URI for register - /public/register 	(HTTP METHOD - POST)
+1. URI for register - /public/register 			(HTTP METHOD - POST)
 
-2. URI for login - /public/login		(HTTP METHOD - POST)
+2. URI for login - /public/login				(HTTP METHOD - POST)
 
-3. URI for update - /secure/update		(HTTP METHOD - PUT)
+3. URI for update - /secure/update				(HTTP METHOD - PUT)
 
-4. URI for deletion - /secure/remove	(HTTP METHOD - DELETE)
+4. URI for deletion - /secure/remove			(HTTP METHOD - DELETE)
 
-5. URI for logout - /secure/logout 		(HTTP METHOD - GET)
+5. URI for logout - /secure/logout 				(HTTP METHOD - GET)
 
-6. URI for saving card details - /secure/cards (HTTP METHOD - PUT)
+6. URI for saving card details - /secure/cards 	(HTTP METHOD - PUT)
 
 
 
