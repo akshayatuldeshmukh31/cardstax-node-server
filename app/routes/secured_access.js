@@ -152,7 +152,7 @@ secureRouter.get("/logout", function(req, res){
 
 
 //TODO Requires implementation of Amazon AWS functions
-secureRouter.put("/cards", function(req, res){
+secureRouter.post("/cards", function(req, res){
 
   //Preparation to recieve multipart form-data
   var form = new formidable.IncomingForm();
@@ -161,7 +161,7 @@ secureRouter.put("/cards", function(req, res){
 
   res.setHeader('Content-Type', 'application/json');
   form.parse(req, function(error, fields, files) {
-    
+
     //Field for new card details
     jsonSavedCard = JSON.parse(fields.savedCardDetails);
     console.log("Received JSON data - " + JSON.stringify(jsonSavedCard, null, 2));
@@ -217,69 +217,98 @@ secureRouter.put("/cards", function(req, res){
                 else if(message==null){
                   console.log("Successful save of cards with change in version for user id " + jsonSavedCard._id);
 
-                  //Call function for profile picture upload
-                  prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
-                    if(message){
-                      console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                  if(files.profilePic!=null){
+
+                    //Call function for profile picture upload
+                    prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
+                      if(message)
+                        console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                      else
+                        console.log("Successful upload of profile picture for " + files.profilePic.name);
                       res.send(JSON.stringify({
                         "success": result,
                         "error": message
                       }));
-                    }
-                    else{
-                      console.log("Successful upload of profile picture for " + files.profilePic.name);
+                    });
+                  }
 
-                      //Call function for company logo upload
-                      prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
-                        if(message)
-                          console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
-                        else
-                          console.log("Successful upload of company logo for " + files.companyLogo.name);
-                      
-                        res.send(JSON.stringify({
-                          "success": result,
-                          "error": message
-                        }));
-                      });
-                    }
-                  });
-                }
-              });
-            }
-            else{
-              console.log("Successful save of cards without change in version for user id " + jsonSavedCard._id);
-              //Call function for profile picture upload
-              prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
-                if(message){
-                  console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
-                  res.send(JSON.stringify({
-                    "success": result,
-                    "error": message
-                  }));
-                }
-                else{
-                  console.log("Successful upload of profile picture for " + files.profilePic.name);
+                  if(files.companyLogo!=null){
 
-                  //Call function for company logo upload
-                  prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
-                    if(message)
-                      console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
-                    else
-                      console.log("Successful upload of company logo for " + files.companyLogo.name);
+                    //Call function for company logo upload
+                    prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
+                      if(message)
+                        console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                      else
+                        console.log("Successful upload of company logo for " + files.companyLogo.name);
                       
+                      res.send(JSON.stringify({
+                        "success": result,
+                        "error": message
+                      }));
+                    });
+                  }
+
+                  if(files.profilePic==null && files.companyLogo==null){
                     res.send(JSON.stringify({
                       "success": result,
                       "error": message
                     }));
-                  });
+                  }            
                 }
               });
+            }
+
+            else{
+              console.log("Successful save of cards without change in version for user id " + jsonSavedCard._id);
+              
+              if(files.profilePic!=null){
+
+                //Call function for profile picture upload
+                prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
+                  if(message)
+                    console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                  else
+                    console.log("Successful upload of profile picture for " + files.profilePic.name);
+                  res.send(JSON.stringify({
+                    "success": result,
+                    "error": message
+                  }));
+                });
+              }
+
+              if(files.companyLogo!=null){
+
+                //Call function for company logo upload
+                prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
+                  if(message)
+                    console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
+                  else
+                    console.log("Successful upload of company logo for " + files.companyLogo.name);
+                      
+                  res.send(JSON.stringify({
+                    "success": result,
+                    "error": message
+                  }));
+                });
+              }
+
+              if(files.profilePic==null && files.companyLogo==null){
+                res.send(JSON.stringify({
+                  "success": result,
+                  "error": message
+                }));
+              }            
             }  
           }
         });
       }
     });
   });
+});
+
+//Function to upload backup
+secureRouter.post("/backup", function(req, res){
+
 });
 
 //Function to parse file as preparation for storing in S3

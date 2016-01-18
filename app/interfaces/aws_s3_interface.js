@@ -35,6 +35,12 @@ function uploadProfilePicture(filePath, fileName, fileMimeType, callback){
         		}     
       			else{
         			console.log("Successfully uploaded file " + fileName + " to " + profilePicBucket + "/" + filePath);
+                    fs.unlink(filePath, function(err){
+                        if(err)
+                            console.log("Error in deleting file " + fileName);
+                        else
+                            console.log(fileName + " deleted successfully!");
+                    })
         			return callback(statusCodes.operationSuccess, null);   
         		}
    			});    	
@@ -61,6 +67,12 @@ function uploadCompanyLogo(filePath, fileName, fileMimeType, callback){
         		}     
       			else{
         			console.log("Successfully uploaded file " + fileName + " to " + companyLogoBucket + "/" + filePath);
+                    fs.unlink(filePath, function(err){
+                        if(err)
+                            console.log("Error in deleting file " + fileName);
+                        else
+                            console.log(fileName + " deleted successfully!");
+                    })
         			return callback(statusCodes.operationSuccess, null);   
         		}
    			});    	
