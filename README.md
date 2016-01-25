@@ -164,7 +164,7 @@ Work done till date -
 	JSON key values:
 
 		a. Check myCard Google Group for the format of backup as given by Chintan
-		
+
 
 
 * Implemented test implementation of JSON Web Tokens (Authentication + Sessions). To be expanded and tested... (ATTENTION!!)
@@ -228,6 +228,8 @@ Work done till date -
 5. URI for logout - /secure/logout 				(HTTP METHOD - GET)
 
 6. URI for saving card details - /secure/cards 	(HTTP METHOD - PUT)
+
+6. URI for saving backup - /secure/backup		(HTTP METHOD - POST)
 
 
 
