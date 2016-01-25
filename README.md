@@ -232,6 +232,15 @@ Work done till date -
 6. URI for saving backup - /secure/backup		(HTTP METHOD - POST)
 
 
+*** Naming Convention for Files in Amazon S3 ***
+
+1. Profile pics --> (UID of the user) + "-profile." + fileExtension
+
+2. Company logo --> (UID of the user) + "-company." + fileExtension
+
+3. Backup 		--> (UID of the user) + "-backup.json"
+
+
 
 Additionals -		
 
@@ -242,3 +251,4 @@ Additionals -
 3. AWSAccessKeyId = AKIAJOE6W23TWYYAHU2Q
 
 4. AWSSecretKey = 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
+

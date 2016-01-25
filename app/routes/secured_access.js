@@ -306,7 +306,7 @@ secureRouter.post("/cards", function(req, res){
   });
 });
 
-//Function to upload backup
+//Function to upload backup as given by the app
 secureRouter.post("/backup", function(req, res){
   res.setHeader('Content-Type', 'application/json');
   amazonS3Methods.uploadBackup(req.body._id + "-backup.json", JSON.stringify(req.body), "application/json", function(result, message){
