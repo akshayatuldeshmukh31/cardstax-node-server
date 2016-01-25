@@ -154,6 +154,18 @@ Work done till date -
 		b. error
 
 
+* Developed function to implement backup saves in Amazon S3
+
+	HTTP header key values:
+
+		a. x-access-token
+		b. Content-Type = application/json
+
+	JSON key values:
+
+		a. Check myCard Google Group for the format of backup as given by Chintan
+		
+
 
 * Implemented test implementation of JSON Web Tokens (Authentication + Sessions). To be expanded and tested... (ATTENTION!!)
 
