@@ -220,7 +220,7 @@ secureRouter.post("/cards", function(req, res){
                   if(files.profilePic!=null){
 
                     //Call function for profile picture upload
-                    prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
+                    amazonS3Methods.prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
                       if(message)
                         console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
                       else
@@ -235,7 +235,7 @@ secureRouter.post("/cards", function(req, res){
                   if(files.companyLogo!=null){
 
                     //Call function for company logo upload
-                    prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
+                    amazonS3Methods.prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
                       if(message)
                         console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
                       else
@@ -264,7 +264,7 @@ secureRouter.post("/cards", function(req, res){
               if(files.profilePic!=null){
 
                 //Call function for profile picture upload
-                prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
+                amazonS3Methods.prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
                   if(message)
                     console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
                   else
@@ -279,7 +279,7 @@ secureRouter.post("/cards", function(req, res){
               if(files.companyLogo!=null){
 
                 //Call function for company logo upload
-                prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
+                amazonS3Methods.prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
                   if(message)
                     console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
                   else
@@ -308,73 +308,14 @@ secureRouter.post("/cards", function(req, res){
 
 //Function to upload backup
 secureRouter.post("/backup", function(req, res){
-
+  res.setHeader('Content-Type', 'application/json');
+  amazonS3Methods.uploadBackup(req.body._id + "-backup.json", JSON.stringify(req.body), "application/json", function(result, message){
+    res.send(JSON.stringify({
+      "success": result,
+      "error" : message
+    }));
+  });
 });
-
-//Function to parse file as preparation for storing in S3
-function prepareForProfileImageUpload(profilePic, id, callback){
-  
-  var profilePicPath = profilePic.path;
-  var profilePicExt = profilePic.name.split('.').pop();
-  var profilePicIndex = null;
-  profilePicIndex = profilePicPath.lastIndexOf("\\") + 1;
-  if(profilePicIndex==null)
-    profilePicIndex = profilePicPath.lastIndexOf("/") + 1;
-  var profilePicName = id + '-profile.' + profilePicExt; 
-  var profilePicNewPath = path.join(__dirname + "/../uploads/" + profilePicName);
-  
-  console.log("Profile picture old path - " + profilePicPath);          
-  fs.rename(profilePicPath, profilePicNewPath, function(err){
-    if(err){
-      console.log("Profile picture renaming error - " + err);
-      return callback(statusCodes.operationError, err);
-    }
-    else{
-      console.log("Profile picture renamed");
-      amazonS3Methods.uploadProfilePicture(profilePicNewPath, profilePicName, profilePic.type, function(result, message){
-        if(message)
-          console.log("Error in uploading profile picture for " + profilePicName);
-        else
-          console.log("Profile picture uploaded successfully for " + profilePicName);
-
-        return callback(result, message);
-      });
-    }
-  });
-}
-
-
-//Function to parse file as preparation for storing in S3
-function prepareForCompanyLogoUpload(companyLogo, id, callback){
-  
-  var companyLogoPath = companyLogo.path;
-  var companyLogoExt = companyLogo.name.split('.').pop();
-  var companyLogoIndex = null;
-  companyLogoIndex = companyLogoPath.lastIndexOf("\\") + 1;
-  if(companyLogoIndex==null)
-    companyLogoIndex = companyLogoPath.lastIndexOf("/") + 1;
-  var companyLogoName = id + '-company.' + companyLogoExt; 
-  var companyLogoNewPath = path.join(__dirname + "/../uploads/" + companyLogoName);
-  
-  console.log("Company logo old path - " + companyLogoPath);   
-  fs.rename(companyLogoPath, companyLogoNewPath, function(err){
-    if(err){
-      console.log("Company logo renaming error - " + err);
-      return callback(statusCodes.operationError, err);
-    }
-    else{
-      console.log("Company logo renamed");
-      amazonS3Methods.uploadCompanyLogo(companyLogoNewPath, companyLogoName, companyLogo.type, function(result, message){
-        if(message)
-          console.log("Error in uploading company logo for " + companyLogoName);
-        else
-          console.log("Company logo uploaded successfully for " + companyLogoName);
-
-        return callback(result, message);
-      });
-    }
-  });
-}
 
 module.exports = secureRouter;
 
