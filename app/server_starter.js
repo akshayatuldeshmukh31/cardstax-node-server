@@ -14,6 +14,7 @@ var config = require("./../config/config");
 var mongoAccountsInterface = require("./interfaces/mongodb_accounts_interface");
 var mongoCardsInterface = require("./interfaces/mongodb_cards_interface");
 var routeIndex = require("./routes/index");
+var winston = require("winston");
 
 //For Express
 var express = require("express");

@@ -317,6 +317,10 @@ secureRouter.post("/backup", function(req, res){
   });
 });
 
+secureRouter.get("/backup", function(req, res){
+  res.setHeader('Content-Type', 'application/json');
+});
+
 module.exports = secureRouter;
 
 

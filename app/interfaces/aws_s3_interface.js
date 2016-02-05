@@ -51,53 +51,74 @@ function uploadProfilePicture(filePath, fileName, fileMimeType, callback){
 
 function returnProfilePictureToExpressServer(){
 	//TODO Function to return the profile picture of a particular user
+  var key = id + "-profile";
+  var params = {Bucket: profilePicBucket, Key: key};
+  s3.getObject(params, function(err, data){
+    if(err)
+      console.log("Encountered error in retrieving profile picture for " + id);
+    else if(data){
+      var profilePic = fs.createWriteStream(__dirname + "/../downloads/" + key);
+      profilePic.write(data);
+      profilePic.end();
+    }
+  });
 }
 
 function uploadCompanyLogo(filePath, fileName, fileMimeType, callback){
 	fs.readFile(filePath, function read(err, data) {
 		if(err){
-        	console.log("Error in reading file");
+      console.log("Error in reading file");
+      return callback(statusCodes.operationError, err);
+    }
+    else{
+      var params = {Bucket: companyLogoBucket, Key: fileName, Body: data, ContentType: fileMimeType, ACL: 'public-read'};
+    	s3.putObject(params, function(err, data) {
+      	if (err){       
+        	console.log("Error in putObject for company logo. Params - " + params);
         	return callback(statusCodes.operationError, err);
+        }     
+      	else{
+        	console.log("Successfully uploaded file " + fileName + " to " + companyLogoBucket + "/" + filePath);
+          fs.unlink(filePath, function(err){
+            if(err)
+              console.log("Error in deleting file " + fileName);
+            else
+              console.log(fileName + " deleted successfully!");
+          });
+        	return callback(statusCodes.operationSuccess, null);   
         }
-        else{
-    		var params = {Bucket: companyLogoBucket, Key: fileName, Body: data, ContentType: fileMimeType, ACL: 'public-read'};
-    		s3.putObject(params, function(err, data) {
-      			if (err){       
-        			console.log("Error in putObject for company logo. Params - " + params);
-        			return callback(statusCodes.operationError, err);
-        		}     
-      			else{
-        			console.log("Successfully uploaded file " + fileName + " to " + companyLogoBucket + "/" + filePath);
-                    fs.unlink(filePath, function(err){
-                        if(err)
-                            console.log("Error in deleting file " + fileName);
-                        else
-                            console.log(fileName + " deleted successfully!");
-                    })
-        			return callback(statusCodes.operationSuccess, null);   
-        		}
-   			});    	
-        }
-    });
+   		});    	
+    }
+  });
 }
 
 function returnCompanyLogoToExpressServer(){
 	//TODO Function to return the company logo of a particular user
+  var key = id + "-company";
+  var params = {Bucket: companyLogoBucket, Key: key};
+  s3.getObject(params, function(err, data){
+    if(err)
+      console.log("Encountered error in retrieving company logo for " + id);
+    else if(data){
+      var companyLogo = fs.createWriteStream(__dirname + "/../downloads/" + key);
+      companyLogo.write(data);
+      companyLogo.end();
+    }
+  });
 }
 
 function uploadBackup(fileName, data, fileMimeType, callback){
-	//TODO Function to save backup of cards owned and acquired by the user
-    var params = {Bucket: backupBucket, Key: fileName, Body: data, ContentType: fileMimeType, ACL: 'public-read'};
-    s3.putObject(params, function(err, data) {
-                if (err){       
-                    console.log("Error in putObject for backup. Params - " + params);
-                    return callback(statusCodes.operationError, err);
-                }
-                else{
-                    console.log("Succesfully uploaded "+ fileName + " to backup.");
-                    return callback(statusCodes.operationSuccess, err);
-                }
-            });   
+  var params = {Bucket: backupBucket, Key: fileName, Body: data, ContentType: fileMimeType, ACL: 'public-read'};
+  s3.putObject(params, function(err, data) {
+    if (err){       
+      console.log("Error in putObject for backup. Params - " + params);
+      return callback(statusCodes.operationError, err);
+    }
+    else{
+      console.log("Succesfully uploaded "+ fileName + " to backup.");
+      return callback(statusCodes.operationSuccess, err);
+    }
+  });   
 }
 
 function returnBackupToExpressServer(){
@@ -113,10 +134,10 @@ function prepareForProfileImageUpload(profilePic, id, callback){
   profilePicIndex = profilePicPath.lastIndexOf("\\") + 1;
   if(profilePicIndex==null)
     profilePicIndex = profilePicPath.lastIndexOf("/") + 1;
-  var profilePicName = id + '-profile.' + profilePicExt; 
-  var profilePicNewPath = path.join(__dirname + "/../uploads/" + profilePicName);
-  
-  console.log("Profile picture old path - " + profilePicPath);          
+  var profilePicName = id + "-profile"; 
+  var profilePicNewPath = __dirname + "/../uploads/" + profilePicName + "." + profilePicExt;
+    
+  console.log("Profile picture old path - " + profilePicPath);        
   fs.rename(profilePicPath, profilePicNewPath, function(err){
     if(err){
       console.log("Profile picture renaming error - " + err);
@@ -124,7 +145,7 @@ function prepareForProfileImageUpload(profilePic, id, callback){
     }
     else{
       console.log("Profile picture renamed");
-      amazonS3Methods.uploadProfilePicture(profilePicNewPath, profilePicName, profilePic.type, function(result, message){
+      uploadProfilePicture(profilePicNewPath, profilePicName, profilePic.type, function(result, message){
         if(message)
           console.log("Error in uploading profile picture for " + profilePicName);
         else
@@ -145,8 +166,8 @@ function prepareForCompanyLogoUpload(companyLogo, id, callback){
   companyLogoIndex = companyLogoPath.lastIndexOf("\\") + 1;
   if(companyLogoIndex==null)
     companyLogoIndex = companyLogoPath.lastIndexOf("/") + 1;
-  var companyLogoName = id + '-company.' + companyLogoExt; 
-  var companyLogoNewPath = path.join(__dirname + "/../uploads/" + companyLogoName);
+  var companyLogoName = id + "-company"; 
+  var companyLogoNewPath = __dirname + "/../uploads/" + companyLogoName + "." + companyLogoExt;
   
   console.log("Company logo old path - " + companyLogoPath);   
   fs.rename(companyLogoPath, companyLogoNewPath, function(err){
@@ -156,7 +177,7 @@ function prepareForCompanyLogoUpload(companyLogo, id, callback){
     }
     else{
       console.log("Company logo renamed");
-      amazonS3Methods.uploadCompanyLogo(companyLogoNewPath, companyLogoName, companyLogo.type, function(result, message){
+      uploadCompanyLogo(companyLogoNewPath, companyLogoName, companyLogo.type, function(result, message){
         if(message)
           console.log("Error in uploading company logo for " + companyLogoName);
         else
