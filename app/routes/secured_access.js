@@ -217,87 +217,35 @@ secureRouter.post("/cards", function(req, res){
                 else if(message==null){
                   console.log("Successful save of cards with change in version for user id " + jsonSavedCard._id);
 
-                  if(files.profilePic!=null){
+                  amazonS3Methods.imageUploaderEntryPoint(jsonSavedCard._id, files.profilePic, files.companyLogo, function(result, message){
+                    if(message)
+                      console.log("Image upload failure!");
+                    else
+                      console.log("Image upload success!");
 
-                    //Call function for profile picture upload
-                    amazonS3Methods.prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
-                      if(message)
-                        console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
-                      else
-                        console.log("Successful upload of profile picture for " + files.profilePic.name);
-                      res.send(JSON.stringify({
-                        "success": result,
-                        "error": message
-                      }));
-                    });
-                  }
-
-                  if(files.companyLogo!=null){
-
-                    //Call function for company logo upload
-                    amazonS3Methods.prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
-                      if(message)
-                        console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
-                      else
-                        console.log("Successful upload of company logo for " + files.companyLogo.name);
-                      
-                      res.send(JSON.stringify({
-                        "success": result,
-                        "error": message
-                      }));
-                    });
-                  }
-
-                  if(files.profilePic==null && files.companyLogo==null){
                     res.send(JSON.stringify({
                       "success": result,
                       "error": message
                     }));
-                  }            
+                  });
                 }
               });
             }
 
             else{
               console.log("Successful save of cards without change in version for user id " + jsonSavedCard._id);
-              
-              if(files.profilePic!=null){
 
-                //Call function for profile picture upload
-                amazonS3Methods.prepareForProfileImageUpload(files.profilePic, jsonSavedCard._id, function(result, message){
-                  if(message)
-                    console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
-                  else
-                    console.log("Successful upload of profile picture for " + files.profilePic.name);
-                  res.send(JSON.stringify({
-                    "success": result,
-                    "error": message
-                  }));
-                });
-              }
+              amazonS3Methods.imageUploaderEntryPoint(jsonSavedCard._id, files.profilePic, files.companyLogo, function(result, message){
+                if(message)
+                  console.log("Image upload failure!");
+                else
+                  console.log("Image upload success!");
 
-              if(files.companyLogo!=null){
-
-                //Call function for company logo upload
-                amazonS3Methods.prepareForCompanyLogoUpload(files.companyLogo, jsonSavedCard._id, function(result, message){
-                  if(message)
-                    console.log("Uploading profile picture was unsuccessful for " + files.profilePic.name);
-                  else
-                    console.log("Successful upload of company logo for " + files.companyLogo.name);
-                      
-                  res.send(JSON.stringify({
-                    "success": result,
-                    "error": message
-                  }));
-                });
-              }
-
-              if(files.profilePic==null && files.companyLogo==null){
                 res.send(JSON.stringify({
                   "success": result,
                   "error": message
                 }));
-              }            
+              });           
             }  
           }
         });

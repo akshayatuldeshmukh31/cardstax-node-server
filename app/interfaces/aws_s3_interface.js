@@ -203,6 +203,56 @@ function prepareForCompanyLogoUpload(companyLogo, id, callback){
   });
 }
 
+//Function which calls all functions related to image uploads
+function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
+  if(profilePic==null && companyLogo==null){
+    callback(statusCodes.operationSuccess, null);
+  }
+  else{
+    if(profilePic!=null){
+      //Call function for profile picture upload
+      prepareForProfileImageUpload(profilePic, id, function(result, message){
+        if(message){
+          console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
+          callback(statusCodes.operationError, error);
+        }
+        else{
+          console.log("Successful upload of profile picture for " + profilePic.name);
+                      
+          if(companyLogo!=null){
+            //Call function for company logo upload
+            prepareForCompanyLogoUpload(companyLogo, id, function(result, message){
+              if(message){
+                console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
+                callback(statusCodes.operationError, message);
+              }
+              else{
+                console.log("Successful upload of company logo for " + companyLogo.name);
+                callback(statusCodes.operationSuccess, message);
+              }
+            });
+          }
+          else
+            callback(statusCodes.operationSuccess, message);
+        }
+      });
+    }
+    else if(profilePic==null){
+      //Call function for company logo upload
+      prepareForCompanyLogoUpload(companyLogo, id, function(result, message){
+        if(message){
+          console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
+          callback(statusCodes.operationError, message);
+        }
+        else{
+          console.log("Successful upload of company logo for " + companyLogo.name);
+          callback(statusCodes.operationSuccess, message);
+        }
+      });
+    }
+  }
+}
+
 exports.uploadProfilePicture = uploadProfilePicture;
 exports.returnProfilePictureToExpressServer = returnProfilePictureToExpressServer;
 exports.uploadCompanyLogo = uploadCompanyLogo;
@@ -211,3 +261,4 @@ exports.uploadBackup = uploadBackup;
 exports.returnBackupToExpressServer = returnBackupToExpressServer;
 exports.prepareForProfileImageUpload = prepareForProfileImageUpload;
 exports.prepareForCompanyLogoUpload = prepareForCompanyLogoUpload;
+exports.imageUploaderEntryPoint = imageUploaderEntryPoint;
