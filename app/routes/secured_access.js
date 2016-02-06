@@ -306,6 +306,40 @@ secureRouter.post("/cards", function(req, res){
   });
 });
 
+//TEST for retrieving profile pictures
+secureRouter.get("/profilePic", function(req, res){
+  var id = req.decoded._id;
+  res.setHeader('Content-Type', 'application/json');
+  amazonS3Methods.returnProfilePictureToExpressServer(id, function(result, message){
+    if(message)
+      console.log("Profile picture download for id " + id + " was unsuccessful");
+    else
+      console.log("Profile picture download for id " + id + " was successful");
+
+    res.send(JSON.stringify({
+      "success": result,
+      "error" : message
+    }));
+  });
+});
+
+//TEST for retrieving profile pictures
+secureRouter.get("/companyLogo", function(req, res){
+  var id = req.decoded._id;
+  res.setHeader('Content-Type', 'application/json');
+  amazonS3Methods.returnCompanyLogoToExpressServer(id, function(result, message){
+    if(message)
+      console.log("Company logo download for id " + id + " was unsuccessful");
+    else
+      console.log("Company logo download for id " + id + " was successful");
+
+    res.send(JSON.stringify({
+      "success": result,
+      "error" : message
+    }));
+  });
+});
+
 //Function to upload backup as given by the app
 secureRouter.post("/backup", function(req, res){
   res.setHeader('Content-Type', 'application/json');

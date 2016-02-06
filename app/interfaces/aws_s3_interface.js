@@ -49,17 +49,28 @@ function uploadProfilePicture(filePath, fileName, fileMimeType, callback){
     });
 }
 
-function returnProfilePictureToExpressServer(){
+function returnProfilePictureToExpressServer(id, callback){
 	//TODO Function to return the profile picture of a particular user
   var key = id + "-profile";
+  console.log("Profile picture key is " + key);
   var params = {Bucket: profilePicBucket, Key: key};
+  
   s3.getObject(params, function(err, data){
-    if(err)
+    if(err){
       console.log("Encountered error in retrieving profile picture for " + id);
+      callback(statusCodes.operationError, err);
+    }
     else if(data){
-      var profilePic = fs.createWriteStream(__dirname + "/../downloads/" + key);
-      profilePic.write(data);
-      profilePic.end();
+      var profilePicExt = data.ContentType.split('/').pop();
+      var file = __dirname + "/../downloads/" + key + "." + profilePicExt;
+      console.log("Downloaded file location - " + file);
+
+      fs.writeFile(file, data.Body, function (err){
+        if(err)
+          callback(statusCodes.operationError, err);
+        else
+          callback(statusCodes.operationSuccess, err);
+      });
     }
   });
 }
@@ -92,17 +103,28 @@ function uploadCompanyLogo(filePath, fileName, fileMimeType, callback){
   });
 }
 
-function returnCompanyLogoToExpressServer(){
+function returnCompanyLogoToExpressServer(id, callback){
 	//TODO Function to return the company logo of a particular user
   var key = id + "-company";
+  console.log("Company logo key is " + key);
   var params = {Bucket: companyLogoBucket, Key: key};
+  
   s3.getObject(params, function(err, data){
-    if(err)
+    if(err){
       console.log("Encountered error in retrieving company logo for " + id);
+      callback(statusCodes.operationError, err);
+    }
     else if(data){
-      var companyLogo = fs.createWriteStream(__dirname + "/../downloads/" + key);
-      companyLogo.write(data);
-      companyLogo.end();
+      var companyLogoExt = data.ContentType.split('/').pop();
+      var file = __dirname + "/../downloads/" + key + "." + companyLogoExt;
+      console.log("Downloaded file location - " + file);
+
+      fs.writeFile(file, data.Body, function (err){
+        if(err)
+          callback(statusCodes.operationError, err);
+        else
+          callback(statusCodes.operationSuccess, err);
+      });
     }
   });
 }
@@ -130,10 +152,6 @@ function prepareForProfileImageUpload(profilePic, id, callback){
   
   var profilePicPath = profilePic.path;
   var profilePicExt = profilePic.name.split('.').pop();
-  var profilePicIndex = null;
-  profilePicIndex = profilePicPath.lastIndexOf("\\") + 1;
-  if(profilePicIndex==null)
-    profilePicIndex = profilePicPath.lastIndexOf("/") + 1;
   var profilePicName = id + "-profile"; 
   var profilePicNewPath = __dirname + "/../uploads/" + profilePicName + "." + profilePicExt;
     
@@ -162,10 +180,6 @@ function prepareForCompanyLogoUpload(companyLogo, id, callback){
   
   var companyLogoPath = companyLogo.path;
   var companyLogoExt = companyLogo.name.split('.').pop();
-  var companyLogoIndex = null;
-  companyLogoIndex = companyLogoPath.lastIndexOf("\\") + 1;
-  if(companyLogoIndex==null)
-    companyLogoIndex = companyLogoPath.lastIndexOf("/") + 1;
   var companyLogoName = id + "-company"; 
   var companyLogoNewPath = __dirname + "/../uploads/" + companyLogoName + "." + companyLogoExt;
   
