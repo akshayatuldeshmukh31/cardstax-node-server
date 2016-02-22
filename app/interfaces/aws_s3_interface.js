@@ -143,8 +143,18 @@ function uploadBackup(fileName, data, fileMimeType, callback){
   });   
 }
 
-function returnBackupToExpressServer(){
-	//TODO Function to return the backup of cards owned and acquired by a particular user
+function returnBackupToExpressServer(id, fileName, callback){
+  var params = {Bucket: backupBucket, Key: fileName};
+
+  s3.getObject(params, function(err, data){
+    if(err){
+      console.log("Encountered error in retrieving backup for " + id);
+      callback(statusCodes.operationError, err, null);
+    }
+    else if(data){
+      callback(statusCodes.operationSuccess, err, data.Body.toString());
+    };
+  });
 }
 
 //Function to parse file as preparation for storing in S3
@@ -208,7 +218,7 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
  
   var counter1 = -2;
   var counter2 = -2;
-  var errorMessage, sentCallback = 0;
+  var sentCallback = 0;
 
   if(profilePic!=null){
     counter1 = -1;
@@ -216,7 +226,6 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
       if(message){
         console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
         counter1 = 0;
-        errorMessage = message;
       }
       else{
         console.log("Successful upload of profile picture for " + profilePic.name);
@@ -246,7 +255,6 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
       if(message){
         console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
         counter2 = 0;
-        errorMessage = message;
       }
       else{
         console.log("Successful upload of company logo for " + companyLogo.name);
@@ -269,55 +277,6 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
       }
     });
   }
-
-  /*
-  if(profilePic==null && companyLogo==null){
-    callback(statusCodes.operationSuccess, null);
-  }
-  else{
-    if(profilePic!=null){
-      //Call function for profile picture upload
-      prepareForProfileImageUpload(profilePic, id, function(result, message){
-        if(message){
-          console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
-          callback(statusCodes.operationError, message);
-        }
-        else{
-          console.log("Successful upload of profile picture for " + profilePic.name);
-                      
-          if(companyLogo!=null){
-            //Call function for company logo upload
-            prepareForCompanyLogoUpload(companyLogo, id, function(result, message){
-              if(message){
-                console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
-                callback(statusCodes.operationError, message);
-              }
-              else{
-                console.log("Successful upload of company logo for " + companyLogo.name);
-                callback(statusCodes.operationSuccess, message);
-              }
-            });
-          }
-          else
-            callback(statusCodes.operationSuccess, message);
-        }
-      });
-    }
-    else if(profilePic==null){
-      //Call function for company logo upload
-      prepareForCompanyLogoUpload(companyLogo, id, function(result, message){
-        if(message){
-          console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
-          callback(statusCodes.operationError, message);
-        }
-        else{
-          console.log("Successful upload of company logo for " + companyLogo.name);
-          callback(statusCodes.operationSuccess, message);
-        }
-      });
-    }
-  } 
-  */
 }
 
 exports.uploadProfilePicture = uploadProfilePicture;

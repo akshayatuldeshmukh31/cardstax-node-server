@@ -254,13 +254,6 @@ secureRouter.put("/cards", function(req, res){
   });
 });
 
-
-//TODO Endpoint for retrieving backups
-secureRouter.get("/cards", function(req, res){
-  
-});
-
-
 //TEST for retrieving profile pictures
 secureRouter.get("/profilePic", function(req, res){
   var id = req.decoded._id;
@@ -278,7 +271,7 @@ secureRouter.get("/profilePic", function(req, res){
   });
 });
 
-//TEST for retrieving profile pictures
+//TEST for retrieving company pictures
 secureRouter.get("/companyLogo", function(req, res){
   var id = req.decoded._id;
   res.setHeader('Content-Type', 'application/json');
@@ -306,8 +299,25 @@ secureRouter.post("/backup", function(req, res){
   });
 });
 
-secureRouter.get("/backup", function(req, res){
-  res.setHeader('Content-Type', 'application/json');
+
+//TODO Endpoint for retrieving backups
+secureRouter.get("/cards", function(req, res){
+  console.log("User " + req.decoded._id + " sent a request to retrieve backup.");
+  var backupFile = req.decoded._id + "-backup.json";
+  amazonS3Methods.returnBackupToExpressServer(req.decoded._id, backupFile, function(result, message, data){
+    if(message){
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify({
+      "success": result,
+      "error" : message
+      }));
+    }
+    else{
+      console.log(data);
+      res.send("Done");
+    }
+  })
+
 });
 
 module.exports = secureRouter;
