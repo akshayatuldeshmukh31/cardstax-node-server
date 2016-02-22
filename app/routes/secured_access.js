@@ -152,7 +152,7 @@ secureRouter.get("/logout", function(req, res){
 
 
 //TODO Requires implementation of Amazon AWS functions
-secureRouter.post("/cards", function(req, res){
+secureRouter.put("/cards", function(req, res){
 
   //Preparation to recieve multipart form-data
   var form = new formidable.IncomingForm();
@@ -253,6 +253,13 @@ secureRouter.post("/cards", function(req, res){
     });
   });
 });
+
+
+//TODO Endpoint for retrieving backups
+secureRouter.get("/cards", function(req, res){
+  
+});
+
 
 //TEST for retrieving profile pictures
 secureRouter.get("/profilePic", function(req, res){

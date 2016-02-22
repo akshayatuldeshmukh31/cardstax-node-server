@@ -205,6 +205,72 @@ function prepareForCompanyLogoUpload(companyLogo, id, callback){
 
 //Function which calls all functions related to image uploads
 function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
+ 
+  var counter1 = -2;
+  var counter2 = -2;
+  var errorMessage, sentCallback = 0;
+
+  if(profilePic!=null){
+    counter1 = -1;
+    prepareForProfileImageUpload(profilePic, id, function(result, message){
+      if(message){
+        console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
+        counter1 = 0;
+        errorMessage = message;
+      }
+      else{
+        console.log("Successful upload of profile picture for " + profilePic.name);
+        counter1 = 1;
+      }
+
+      if(companyLogo==null && counter1==1){
+        sentCallback = 1;
+        callback(statusCodes.operationSuccess, message);
+      }
+      else if(counter1==0){
+        sentCallback = 1;
+        callback(statusCodes.operationError, message);
+      }
+      else if(companyLogo!=null && counter1==1){
+        if(sentCallback!=1 && counter2==1){
+          sentCallback = 1;
+          callback(statusCodes.operationSuccess, message);
+        }
+      }
+    });
+  }
+
+  if(companyLogo!=null){
+    counter2 = -1;
+    prepareForCompanyLogoUpload(companyLogo, id, function(result, message){
+      if(message){
+        console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
+        counter2 = 0;
+        errorMessage = message;
+      }
+      else{
+        console.log("Successful upload of company logo for " + companyLogo.name);
+        counter2 = 1;
+      }
+
+      if(profilePic==null && counter2==1){
+        sentCallback = 1;
+        callback(statusCodes.operationSuccess, message);
+      }
+      else if(counter2==0){
+        sentCallback = 1;
+        callback(statusCodes.operationError, message);
+      }
+      else if(profilePic!=null && counter2==1){
+        if(sentCallback!=1 && counter1==1){
+          sentCallback = 1;
+          callback(statusCodes.operationSuccess, message);
+        }
+      }
+    });
+  }
+
+  /*
   if(profilePic==null && companyLogo==null){
     callback(statusCodes.operationSuccess, null);
   }
@@ -214,7 +280,7 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
       prepareForProfileImageUpload(profilePic, id, function(result, message){
         if(message){
           console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
-          callback(statusCodes.operationError, error);
+          callback(statusCodes.operationError, message);
         }
         else{
           console.log("Successful upload of profile picture for " + profilePic.name);
@@ -250,7 +316,8 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
         }
       });
     }
-  }
+  } 
+  */
 }
 
 exports.uploadProfilePicture = uploadProfilePicture;
