@@ -1,5 +1,6 @@
 var serverInstance = require("./../server_starter");
 var statusCodes = require("./../status_codes");
+var logger = require("./../../config/logger");
 var loginCollection = null;
 
 //To create new login details in the login collection during registration
@@ -10,11 +11,11 @@ function createLoginDetails(jsonObjForLoginColl, callback){
 
 	loginCollection.insertOne(jsonObjForLoginColl, function(err,result){
 		if(err){
-			console.log("LOGIN_DETAILS(SERVER)--> Error in inserting data - "+err);
+			logger.error("Login Collection - Error in registration for username '" + jsonObjForLoginColl._id + "': "+err);
 			return callback(statusCodes.operationError, err);
 		}
 		else if(result){
-			console.log("LOGIN_DETAILS(SERVER)--> Data entered successfully! " + result);
+			logger.info("Login Collection - Registration successful for UID " + jsonObjForLoginColl._id + "!");
 			return callback(statusCodes.operationSuccess, statusCodes.successMessage);
 		}
 	});
@@ -28,15 +29,15 @@ function searchLoginDetails(jsonObjForLoginColl, callback){
 
 	loginCollection.findOne(jsonObjForLoginColl, function(err, item){
 		if(err){
-			console.log("LOGIN_DETAILS(SERVER)--> Error in finding data - "+err);
+			logger.error("Login Collection - Error while logging in for username '" + jsonObjForLoginColl.userName + "': "+err);
 			callback(statusCodes.operationError, item, err);
 		}
 		else if(err==null && item!=null){
-			console.log("LOGIN_DETAILS(SERVER)--> Data retrieved successfully! ");
+			logger.info("Login Collection - Login successful for username '" + jsonObjForLoginColl.userName + "'!");
 			callback(statusCodes.operationSuccess, item, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){
-			console.log("LOGIN_DETAILS(SERVER)--> No such data (FIND)");
+			logger.warn("Login Collection - No login details exist for username '" + jsonObjForLoginColl.userName + "'");
 			callback(statusCodes.dataNotFound, item, statusCodes.dataNotFoundErrorMessage);	
 		}
 	});
@@ -51,15 +52,15 @@ function updateLoginDetails(jsonUpdateCriteria, jsonNewValue, callback){
 	loginCollection.updateOne(jsonUpdateCriteria,  {$set:jsonNewValue}, {w:1}, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
-			console.log("LOGIN_DETAILS(PUT)--> Error in updating password - "+err);
+			logger.error("Login Collection - Error in updating data: "+err);
 			callback(statusCodes.operationError, err);
 		}
 		else if(result.n==0){
-			console.log("LOGIN_DETAILS(PUT)--> No such data (UPDATE)");
+			logger.warn("Login Collection - No such data (UPDATE)");
 			callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErroMessage);	
 		}
 		else{
-			console.log("LOGIN_DETAILS(PUT)--> Password updated successfully! "+ object);
+			logger.info("Login Collection - Password updated successfully!");
 			callback(statusCodes.operationSuccess, statusCodes.successMessage);
 		}
 	});

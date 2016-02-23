@@ -179,7 +179,8 @@ secureRouter.put("/cards", function(req, res){
     }));
 
     var jsonFindCard = JSON.parse(JSON.stringify({
-      "_id": jsonSavedCard._id
+      "_id": jsonSavedCard._id,
+      "status": statusCodes.recordStatusAlive
     }));
 
     cardMethods.updateCardDetails(jsonFindCard, jsonUpdateCard, function(result, message, mongoRes){
@@ -302,19 +303,30 @@ secureRouter.post("/backup", function(req, res){
 
 //TODO Endpoint for retrieving backups
 secureRouter.get("/cards", function(req, res){
+  res.setHeader('Content-Type', 'application/json');
   console.log("User " + req.decoded._id + " sent a request to retrieve backup.");
   var backupFile = req.decoded._id + "-backup.json";
   amazonS3Methods.returnBackupToExpressServer(req.decoded._id, backupFile, function(result, message, data){
     if(message){
-      res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify({
       "success": result,
       "error" : message
       }));
     }
     else{
-      console.log(data);
-      res.send("Done");
+      var backupData = JSON.parse(data);
+      
+      var jsonFindCriteriaForUser = JSON.parse(JSON.stringify({
+        "_id": backupdata._id,
+        "status": statusCodes.recordStatusAlive
+      }));
+
+      cardMethods.searchCardDetails(jsonFindCriteriaForUser, function(result, message, item){
+        if(message)
+{        }
+      });
+
+
     }
   })
 

@@ -1,5 +1,6 @@
 var serverInstance = require("./../server_starter");
 var statusCodes = require("./../status_codes");
+var logger = require("./../../config/logger");
 var masterCollection = null;
 
 //To insert new user card details in the master collection during registration
@@ -10,11 +11,11 @@ function createCardDetails(jsonObjForMasterColl, callback){
 
 	masterCollection.insertOne(jsonObjForMasterColl, function(err,result){
 		if(err){
-			console.log("MASTER COLL(SERVER)--> Error in inserting data - "+err);
+			logger.error("Master Collection - Error in registration for UID " + jsonObjForMasterColl._id + ": "+err);
 			return callback(statusCodes.operationError, err);
 		}
 		else if(result){
-			console.log("MASTER COLL(SERVER)--> Data entered successfully! " + result);
+			logger.info("Master Collection - Registration successful for UID " + jsonObjForMasterColl._id + "!");
 			return callback(statusCodes.operationSuccess, statusCodes.successMessage);
 		}
 	});
@@ -28,15 +29,15 @@ function searchCardDetails(jsonObjForMasterColl, callback){
 
 	masterCollection.findOne(jsonObjForMasterColl, function(err, item){
 		if(err){
-			console.log("MASTER COLL --> Error in finding data - "+err);
+			logger.error("Master Collection - Error in finding data: "+err);
 			return callback(statusCodes.operationError, item, err);
 		}
 		else if(err==null && item!=null){
-			console.log("MASTER COLL --> Data retrieved successfully! ");
+			logger.warn("Master Collection - Data retrieved successfully!");
 			return callback(statusCodes.operationSuccess, item, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){
-			console.log("MASTER COLL --> No such data (FIND)");
+			logger.info("Master Collection - No such data (FIND)");
 			return callback(statusCodes.dataNotFound, item, statusCodes.dataNotFoundErrorMessage);	
 		}
 	});
@@ -51,15 +52,15 @@ function updateCardDetails(jsonUpdateCriteria, jsonNewValues, callback){
 	masterCollection.updateOne(jsonUpdateCriteria,  {$set:jsonNewValues}, {w:1}, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
-			console.log("MASTER_COLLECTION(PUT)--> Error in updating user card details - "+err);
+			logger.error("Master Collection - Error in updaing user card details: "+err);
 			return callback(statusCodes.operationError, err, result);
 		}
 		else if(result.n==0){
-			console.log("MASTER_COLLECTION(PUT)--> No such data (UPDATE) " + object);
+			logger.warn("Master Collection - No such data (UPDATE)");
 			return callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErrorMessage, result);	
 		}
 		else{
-			console.log("MASTER_COLLECTION(PUT)--> User card details updated successfully! "+ object);
+			logger.info("Master Collection - User card details updated successfully!");
 			return callback(statusCodes.operationSuccess, statusCodes.successMessage, result);
 		}
 	});

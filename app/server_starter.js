@@ -14,7 +14,7 @@ var config = require("./../config/config");
 var mongoAccountsInterface = require("./interfaces/mongodb_accounts_interface");
 var mongoCardsInterface = require("./interfaces/mongodb_cards_interface");
 var routeIndex = require("./routes/index");
-var winston = require("winston");
+var logger = require("./../config/logger");
 
 //For Express
 var express = require("express");
@@ -34,7 +34,7 @@ function startExpressServer(){
 		var host = server.address().address;
 		var port = server.address().port;
 
-		console.log("Server is operational : "+host+" "+port);
+		logger.info("Express Server - Server is operational: " + host + " " + port);
 	});
 
 	//Function call to load routes
@@ -45,24 +45,24 @@ function startExpressServer(){
 function startMongoServer(){
 	MongoClient.connect(uri, function(err,db){
 		if(err)
-			console.log("Error in connecting to database: "+err);
+			logger.error("MongoDB Server - Error in connecting to database: " + err);
 		else if(db){
-			console.log("Successfully connected to database!");
+			logger.info("MongoDb Server - Successfully connected to database!");
 			database = db;
 
 			//Login Collection
 			loginCollection = db.collection(environmentVariables.mongoLoginDetailsCollectionName);
 			loginCollection.ensureIndex({"_id":1, unique:true}, function(err,results){
 				if(err)
-					console.log("LOGIN_DETAILS--> Error in ensuring index for id: "+err);
+					logger.error("Login Collection - Error in ensuring index for id: "+err);
 				else if(results){
-					console.log("LOGIN_DETAILS--> Index creation is successful for id! "+results);
+					logger.info("Login Collection - Index creation is successful for id!");
 
 					loginCollection.ensureIndex({"userName":1, unique:true}, function(err,results){
 						if(err)
-							console.log("LOGIN_DETAILS--> Error in ensuring index for userName: "+err);
+							logger.error("Login Collection - Error in ensuring index for userName: "+err);
 						else if(results)
-							console.log("LOGIN_DETAILS--> Index creation is successful for userName! "+results);
+							logger.info("Login Collection - Index creation is successful for userName!");
 					});
 				}
 			});
@@ -71,9 +71,9 @@ function startMongoServer(){
 			masterCollection = db.collection(environmentVariables.mongoMasterCollectionName);
 			masterCollection.ensureIndex({"_id":1, unique:true}, function(err,results){
 				if(err)
-					console.log("MASTER COLL--> Error in ensuring index for id: "+err);
+					logger.error("Master Collection - Error in ensuring index for id: "+err);
 				else if(results){
-					console.log("MASTER COLL--> Index creation is successful for id! "+results);
+					logger.info("Master Collection - Index creation is successful for id!");
 				}
 			});
 		}
