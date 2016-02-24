@@ -1,3 +1,13 @@
+/*
+	*********************************************************************************
+	File - mongodb_cards_interface.js
+
+	This file consists of functions to access and manipulate data stored in the 
+	master collection of the MongoDB server.
+
+	*********************************************************************************
+*/
+
 var serverInstance = require("./../server_starter");
 var statusCodes = require("./../status_codes");
 var logger = require("./../../config/logger");
@@ -29,15 +39,15 @@ function searchCardDetails(jsonObjForMasterColl, callback){
 
 	masterCollection.findOne(jsonObjForMasterColl, function(err, item){
 		if(err){
-			logger.error("Master Collection - Error in finding data: "+err);
+			logger.error("Master Collection - Error in finding card details with UID " + jsonObjForMasterColl._id + ": "+err);
 			return callback(statusCodes.operationError, item, err);
 		}
 		else if(err==null && item!=null){
-			logger.warn("Master Collection - Data retrieved successfully!");
+			logger.warn("Master Collection - Card details retrieved successfully for UID " + jsonObjForMasterColl._id + "!");
 			return callback(statusCodes.operationSuccess, item, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){
-			logger.info("Master Collection - No such data (FIND)");
+			logger.info("Master Collection - No such data pertaining to UID " + jsonObjForMasterColl._id);
 			return callback(statusCodes.dataNotFound, item, statusCodes.dataNotFoundErrorMessage);	
 		}
 	});
@@ -52,7 +62,7 @@ function updateCardDetails(jsonUpdateCriteria, jsonNewValues, callback){
 	masterCollection.updateOne(jsonUpdateCriteria,  {$set:jsonNewValues}, {w:1}, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
-			logger.error("Master Collection - Error in updaing user card details: "+err);
+			logger.error("Master Collection - Error in updaing card details of UID " + jsonUpdateCriteria._id + ": "+err);
 			return callback(statusCodes.operationError, err, result);
 		}
 		else if(result.n==0){
@@ -60,7 +70,7 @@ function updateCardDetails(jsonUpdateCriteria, jsonNewValues, callback){
 			return callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErrorMessage, result);	
 		}
 		else{
-			logger.info("Master Collection - User card details updated successfully!");
+			logger.info("Master Collection - Card details of UID " + jsonUpdateCriteria._id + " updated successfully!");
 			return callback(statusCodes.operationSuccess, statusCodes.successMessage, result);
 		}
 	});

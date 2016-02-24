@@ -1,3 +1,13 @@
+/*
+	*********************************************************************************
+	File - mongodb_accounts_interface.js
+
+	This file consists of functions to access and manipulate data stored in the 
+	login collection of the MongoDB server.
+
+	*********************************************************************************
+*/
+
 var serverInstance = require("./../server_starter");
 var statusCodes = require("./../status_codes");
 var logger = require("./../../config/logger");
@@ -37,7 +47,7 @@ function searchLoginDetails(jsonObjForLoginColl, callback){
 			callback(statusCodes.operationSuccess, item, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){
-			logger.warn("Login Collection - No login details exist for username '" + jsonObjForLoginColl.userName + "'");
+			logger.warn("Login Collection - No such data pertaining to username '" + jsonObjForLoginColl.userName + "'");
 			callback(statusCodes.dataNotFound, item, statusCodes.dataNotFoundErrorMessage);	
 		}
 	});
@@ -52,15 +62,15 @@ function updateLoginDetails(jsonUpdateCriteria, jsonNewValue, callback){
 	loginCollection.updateOne(jsonUpdateCriteria,  {$set:jsonNewValue}, {w:1}, function(err,object){
 		var result = JSON.parse(object);
 		if(err){
-			logger.error("Login Collection - Error in updating data: "+err);
+			logger.error("Login Collection - Error in updating login details of UID " + jsonUpdateCriteria._id + ": "+err);
 			callback(statusCodes.operationError, err);
 		}
 		else if(result.n==0){
-			logger.warn("Login Collection - No such data (UPDATE)");
+			logger.warn("Login Collection - No such data pertaining to UID " + jsonUpdateCriteria._id);
 			callback(statusCodes.dataNotFound, statusCodes.dataNotFoundErroMessage);	
 		}
 		else{
-			logger.info("Login Collection - Password updated successfully!");
+			logger.info("Login Collection - Login details updated successfully for UID " + jsonUpdateCriteria._id + "!");
 			callback(statusCodes.operationSuccess, statusCodes.successMessage);
 		}
 	});
