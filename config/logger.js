@@ -1,12 +1,3 @@
-/*
-	*********************************************************************************
-	File - logger.js
-
-	This file defines the configuration of the logger which is used by the server.
-
-	*********************************************************************************
-*/
-
 var winston = require("winston");
 winston.emitErrs = true;
 

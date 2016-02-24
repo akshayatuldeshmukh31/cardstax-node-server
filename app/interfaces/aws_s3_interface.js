@@ -1,10 +1,5 @@
 /*
-  *********************************************************************************
-  File - aws_s3_interface.js
-
-  This file defines functions to access and manipute data stored in Amazon AWS S3.
-
-  *********************************************************************************
+	Consists of AWS S3 methods to handle functions related to cloud backup and picture dumps.
 */
 
 var AWS = require("aws-sdk");
@@ -13,7 +8,6 @@ var environmentVariables = require("./../../config/environmentVariables");
 var configuration = require("./../../config/config");
 var awsConfig = require("./../../config/aws_config.json");
 var statusCodes = require("./../status_codes");
-var logger = require("./../../config/logger");
 
 //AWS configuration
 AWS.config.loadFromPath(__dirname + "./../../config/aws_config.json");
@@ -26,26 +20,27 @@ var backupBucket = configuration.awsBackupBucket;
 
 
 function uploadProfilePicture(filePath, fileName, fileMimeType, callback){
+	console.log("AWS mimetype " + fileMimeType);
 
 	fs.readFile(filePath, function read(err, data) {
 		if(err){
-        	logger.error("Cloud - Error in reading profile picture " + fileName + ": " + err);
+        	console.log("Error in reading file");
         	return callback(statusCodes.operationError, err);
         }
         else{
     		var params = {Bucket: profilePicBucket, Key: fileName, Body: data, ContentType: fileMimeType, ACL: 'public-read'};
     		s3.putObject(params, function(err, data) {
       			if (err){       
-        			logger.error("Cloud - Error in putObject for profile picture. Params: " + params + ". Error: " + err);
+        			console.log("Error in putObject for profile picture. Params - " + params);
         			return callback(statusCodes.operationError, err);
         		}     
       			else{
-        			logger.info("Cloud - Successfully uploaded file " + fileName + " to " + profilePicBucket + "/" + filePath);
+        			console.log("Successfully uploaded file " + fileName + " to " + profilePicBucket + "/" + filePath);
                     fs.unlink(filePath, function(err){
                         if(err)
-                            logger.error("Cloud - Error in deleting file " + fileName + ": " + err);
+                            console.log("Error in deleting file " + fileName);
                         else
-                            logger.info("Cloud - " + fileName + " deleted successfully!");
+                            console.log(fileName + " deleted successfully!");
                     })
         			return callback(statusCodes.operationSuccess, null);   
         		}
@@ -55,53 +50,51 @@ function uploadProfilePicture(filePath, fileName, fileMimeType, callback){
 }
 
 function returnProfilePictureToExpressServer(id, callback){
+	//TODO Function to return the profile picture of a particular user
   var key = id + "-profile";
+  console.log("Profile picture key is " + key);
   var params = {Bucket: profilePicBucket, Key: key};
   
   s3.getObject(params, function(err, data){
     if(err){
-      logger.error("Cloud - Encountered error in retrieving profile picture for UID " + id + ": " + err);
+      console.log("Encountered error in retrieving profile picture for " + id);
       callback(statusCodes.operationError, err);
     }
     else if(data){
       var profilePicExt = data.ContentType.split('/').pop();
       var file = __dirname + "/../downloads/" + key + "." + profilePicExt;
+      console.log("Downloaded file location - " + file);
 
       fs.writeFile(file, data.Body, function (err){
-        if(err){
-          logger.error("Cloud - Error in writing profile picture " + fileName + ": " + err);
+        if(err)
           callback(statusCodes.operationError, err);
-        }
-        else{
-          logger.info("Cloud - " + fileName + " written successfully!");
+        else
           callback(statusCodes.operationSuccess, err);
-        }
       });
     }
   });
 }
 
 function uploadCompanyLogo(filePath, fileName, fileMimeType, callback){
-	
-  fs.readFile(filePath, function read(err, data) {
+	fs.readFile(filePath, function read(err, data) {
 		if(err){
-      logger.error("Cloud - Error in reading company logo " + fileName + ": " + err);
+      console.log("Error in reading file");
       return callback(statusCodes.operationError, err);
     }
     else{
       var params = {Bucket: companyLogoBucket, Key: fileName, Body: data, ContentType: fileMimeType, ACL: 'public-read'};
     	s3.putObject(params, function(err, data) {
       	if (err){       
-        	logger.error("Cloud - Error in putObject for company logo. Params: " + params + ". Error: " + err);
+        	console.log("Error in putObject for company logo. Params - " + params);
         	return callback(statusCodes.operationError, err);
         }     
       	else{
-        	logger.info("Cloud - Successfully uploaded file " + fileName + " to " + companyLogoBucket + "/" + filePath);
+        	console.log("Successfully uploaded file " + fileName + " to " + companyLogoBucket + "/" + filePath);
           fs.unlink(filePath, function(err){
             if(err)
-              logger.error("Cloud - Error in deleting file " + fileName + ": " + err);
+              console.log("Error in deleting file " + fileName);
             else
-              logger.info("Cloud - " + fileName + " deleted successfully!");
+              console.log(fileName + " deleted successfully!");
           });
         	return callback(statusCodes.operationSuccess, null);   
         }
@@ -111,27 +104,26 @@ function uploadCompanyLogo(filePath, fileName, fileMimeType, callback){
 }
 
 function returnCompanyLogoToExpressServer(id, callback){
+	//TODO Function to return the company logo of a particular user
   var key = id + "-company";
+  console.log("Company logo key is " + key);
   var params = {Bucket: companyLogoBucket, Key: key};
   
   s3.getObject(params, function(err, data){
     if(err){
-      logger.error("Cloud - Encountered error in retrieving company logo for UID " + id + ": " + err);
+      console.log("Encountered error in retrieving company logo for " + id);
       callback(statusCodes.operationError, err);
     }
     else if(data){
       var companyLogoExt = data.ContentType.split('/').pop();
       var file = __dirname + "/../downloads/" + key + "." + companyLogoExt;
+      console.log("Downloaded file location - " + file);
 
       fs.writeFile(file, data.Body, function (err){
-        if(err){
-          logger.error("Cloud - Error in writing company logo " + fileName + ": " + err);
+        if(err)
           callback(statusCodes.operationError, err);
-        }
-        else{
-          logger.info("Cloud - " + fileName + " written successfully!");
+        else
           callback(statusCodes.operationSuccess, err);
-        }
       });
     }
   });
@@ -141,11 +133,11 @@ function uploadBackup(fileName, data, fileMimeType, callback){
   var params = {Bucket: backupBucket, Key: fileName, Body: data, ContentType: fileMimeType, ACL: 'public-read'};
   s3.putObject(params, function(err, data) {
     if (err){       
-      logger.error("Cloud - Error in putObject for backup. Params: " + params + ". Error: " + err);
+      console.log("Error in putObject for backup. Params - " + params);
       return callback(statusCodes.operationError, err);
     }
     else{
-      logger.info("Cloud - Succesfully uploaded "+ fileName + " to backup.");
+      console.log("Succesfully uploaded "+ fileName + " to backup.");
       return callback(statusCodes.operationSuccess, err);
     }
   });   
@@ -156,11 +148,10 @@ function returnBackupToExpressServer(id, fileName, callback){
 
   s3.getObject(params, function(err, data){
     if(err){
-      logger.error("Cloud - Encountered error in retrieving backup for UID " + id + ": " + err);
+      console.log("Encountered error in retrieving backup for " + id);
       callback(statusCodes.operationError, err, null);
     }
     else if(data){
-      logger.info("Cloud - Successfully retrieved backup for UID " + id);
       callback(statusCodes.operationSuccess, err, data.Body.toString());
     };
   });
@@ -173,17 +164,20 @@ function prepareForProfileImageUpload(profilePic, id, callback){
   var profilePicExt = profilePic.name.split('.').pop();
   var profilePicName = id + "-profile"; 
   var profilePicNewPath = __dirname + "/../uploads/" + profilePicName + "." + profilePicExt;
-            
+    
+  console.log("Profile picture old path - " + profilePicPath);        
   fs.rename(profilePicPath, profilePicNewPath, function(err){
     if(err){
+      console.log("Profile picture renaming error - " + err);
       return callback(statusCodes.operationError, err);
     }
     else{
+      console.log("Profile picture renamed");
       uploadProfilePicture(profilePicNewPath, profilePicName, profilePic.type, function(result, message){
         if(message)
-          logger.error("Cloud - Error in uploading profile picture for " + profilePicName + ": " + message);
+          console.log("Error in uploading profile picture for " + profilePicName);
         else
-          logger.info("Cloud - Successful upload of profile picture " + profilePicName);
+          console.log("Profile picture uploaded successfully for " + profilePicName);
 
         return callback(result, message);
       });
@@ -199,16 +193,19 @@ function prepareForCompanyLogoUpload(companyLogo, id, callback){
   var companyLogoName = id + "-company"; 
   var companyLogoNewPath = __dirname + "/../uploads/" + companyLogoName + "." + companyLogoExt;
   
+  console.log("Company logo old path - " + companyLogoPath);   
   fs.rename(companyLogoPath, companyLogoNewPath, function(err){
     if(err){
+      console.log("Company logo renaming error - " + err);
       return callback(statusCodes.operationError, err);
     }
     else{
+      console.log("Company logo renamed");
       uploadCompanyLogo(companyLogoNewPath, companyLogoName, companyLogo.type, function(result, message){
         if(message)
-          logger.error("Cloud - Error in uploading company logo " + companyLogoName + ": " + message);
+          console.log("Error in uploading company logo for " + companyLogoName);
         else
-          logger.info("Cloud - Successful upload of company logo " + companyLogoName);
+          console.log("Company logo uploaded successfully for " + companyLogoName);
 
         return callback(result, message);
       });
@@ -227,11 +224,11 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
     counter1 = -1;
     prepareForProfileImageUpload(profilePic, id, function(result, message){
       if(message){
-        logger.warn("Cloud - Unsuccessful upload of profile picture for UID " + id + ": " + message);
+        console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
         counter1 = 0;
       }
       else{
-        logger.info("Cloud - Successful upload of profile picture for UID " + id);
+        console.log("Successful upload of profile picture for " + profilePic.name);
         counter1 = 1;
       }
 
@@ -256,11 +253,11 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
     counter2 = -1;
     prepareForCompanyLogoUpload(companyLogo, id, function(result, message){
       if(message){
-        logger.warn("Cloud - Unsuccessful upload of company logo for UID " + id + ": " + message);
+        console.log("Uploading profile picture was unsuccessful for " + profilePic.name);
         counter2 = 0;
       }
       else{
-        logger.warn("Cloud - Successful upload of company logo for UID " + id);
+        console.log("Successful upload of company logo for " + companyLogo.name);
         counter2 = 1;
       }
 

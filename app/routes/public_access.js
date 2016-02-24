@@ -60,21 +60,18 @@ publicRouter.post("/register", function(req,res){
 	//Call to insert details into login collection of the server
 	userAccountMethods.createLoginDetails(jsonObjForLoginColl, function(result, message){
 		if(message==null){
-			logger.info("POST /register - Login details created successfully for UID " + jsonObjForLoginColl._id + "!");
 
 			//Call to insert details into master collection of the server
 			cardMethods.createCardDetails(jsonObjForMasterColl, function(result, message){
 				
 				//Sending a response to the request
-				if(message){
-					logger.warn("POST /register - Unsuccessful creation of Master details for UID " + jsonObjForMasterColl._id + "!");	
+				if(message){	
 					res.send(JSON.stringify({
 						"success":result,
 						"error": message
 					}));
 				}
 				else{
-					logger.info("POST /register - Master details created successfully for UID " + jsonObjForMasterColl._id + "!");
 					res.send(JSON.stringify({
 						"success":result,
 						"error": message,
@@ -84,7 +81,6 @@ publicRouter.post("/register", function(req,res){
 			});	
 		}
 		else{
-			logger.warn("POST /register - Unsuccessful creation of Login details for UID " + jsonObjForLoginColl._id + "!");
 			res.send(JSON.stringify({
 				"success":result,
 				"error": message
@@ -110,7 +106,13 @@ publicRouter.post("/login", function(req,res){
 		
 		res.setHeader('Content-Type', 'application/json');
 		
-		if(message || (!item)){
+		if(message){
+			res.send(JSON.stringify({
+				"success": result,
+				"error": message
+			}));
+		}
+		else if(!item){
 			res.send(JSON.stringify({
 				"success": result,
 				"error": message
