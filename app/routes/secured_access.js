@@ -22,6 +22,7 @@ var cardMethods = require("./../interfaces/mongodb_cards_interface");
 var amazonS3Methods = require("./../interfaces/aws_s3_interface");
 var config = require("./../../config/config");
 var statusCodes = require("./../status_codes");
+var logger = require("./../../config/logger");
 
 
 //Router middleware for checking validity of token (CHECKPOINT)
@@ -43,8 +44,7 @@ secureRouter.use(function(req, res, next){
       	} 
       	else {
         	// if everything is good, save to request for use in other routes
-        	req.decoded = decoded;
-        	console.log(decoded);    
+        	req.decoded = decoded;  
         	next();
       	}
     	});
@@ -65,7 +65,7 @@ secureRouter.use(function(req, res, next){
 //To update the password of the user account
 secureRouter.put("/update", function(req, res){
 
-  console.log("UPDATE_LOGIN_DETAILS(PUT)--> JSON received - " + JSON.stringify(req.body,null,2));
+  logger.info("PUT /update - JSON received: " + JSON.stringify(req.body,null,2));
 
   var jsonUpdateCriteria = JSON.parse(JSON.stringify({
     "_id": req.body._id,
@@ -79,9 +79,9 @@ secureRouter.put("/update", function(req, res){
   userAccountMethods.updateLoginDetails(jsonUpdateCriteria, jsonUpdatedPassword, function(result, message){
     
     if(message)
-      console.log("UPDATE_LOGIN_DETAILS(PUT)--> Password could not be updated.");  
+      logger.warn("PUT /update - Password could not be updated for UID " + jsonUpdateCriteria._id + "!");  
     else
-      console.log("UPDATE_LOGIN_DETAILS(PUT)--> Password has been successfully updated.");
+      logger.info("PUT /update - Password has been successfully updated for UID " + jsonUpdateCriteria._id + "!");
 
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify({
@@ -95,7 +95,7 @@ secureRouter.put("/update", function(req, res){
 //To delete a user account...basically to change the status of the account to CLOSED
 secureRouter.delete("/remove", function(req,res){
   
-  console.log("REMOVE ACCOUNT(PUT)--> JSON received - " + JSON.stringify(req.body,null,2));
+  console.log("DELETE /remove - JSON received: " + JSON.stringify(req.body,null,2));
 
   var jsonUpdateCriteria = JSON.parse(JSON.stringify({
     "_id": req.body._id,
@@ -110,17 +110,14 @@ secureRouter.delete("/remove", function(req,res){
   cardMethods.updateCardDetails(jsonUpdateCriteria, jsonUpdatedStatus, function(result, message, mongoRes){
     
     res.setHeader('Content-Type', 'application/json');
-    console.log("REMOVE ACCOUNT(PUT)--> Result of updating status in login collection - " + result);
-    
     if(message==null){
       //Call to remove record from login collection of the server
       userAccountMethods.updateLoginDetails(jsonUpdateCriteria, jsonUpdatedStatus, function(result, message){
-        console.log("REMOVE ACCOUNT(PUT)--> Result of updating status in master collection - " + result);
-        
+      
         if(message)
-          console.log("REMOVE ACCOUNT(PUT)--> Unsuccessful update of status of record with UID " + req.body._id);
+          logger.warn("DELETE /remove - Unsuccessful removal of record with UID " + req.body._id + "!");
         else
-          console.log("REMOVE ACCOUNT(PUT)--> Successful update of status of record with UID " + req.body._id);
+          logger.info("DELETE /remove - Successful removal of record with UID " + req.body._id + "!");
         
         res.send(JSON.stringify({
             "success": result,
@@ -129,11 +126,11 @@ secureRouter.delete("/remove", function(req,res){
       }); 
     }
     else{
+      logger.warn("DELETE /remove - Unsuccessful deletion of record with UID " + req.body._id + "!");
       res.send(JSON.stringify({
         "success": result,
         "error": message
       }));
-      console.log("REMOVE ACCOUNT(PUT)--> Unsuccessful deletion of record with UID " + req.body._id);
     }
   });
 });
@@ -141,13 +138,11 @@ secureRouter.delete("/remove", function(req,res){
 
 //To logout from a user account. Requires the destruction of the token.
 secureRouter.get("/logout", function(req, res){
-  console.log("Received request to LOGOUT");
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify({
     "success": statusCodes.operationSuccess,
     "error": statusCodes.successMessage
   }));
-  console.log("LOGOUT executed");
 });
 
 
@@ -164,7 +159,7 @@ secureRouter.put("/cards", function(req, res){
 
     //Field for new card details
     jsonSavedCard = JSON.parse(fields.savedCardDetails);
-    console.log("Received JSON data - " + JSON.stringify(jsonSavedCard, null, 2));
+    logger.info("PUT /cards - JSON received: " + JSON.stringify(jsonSavedCard, null, 2));
 
     var jsonUpdateCard = JSON.parse(JSON.stringify({
     "firstName": jsonSavedCard.firstName,
@@ -185,7 +180,7 @@ secureRouter.put("/cards", function(req, res){
 
     cardMethods.updateCardDetails(jsonFindCard, jsonUpdateCard, function(result, message, mongoRes){
       if(message){
-        console.log("Encountered error while updating card details of user id " + jsonSavedCard._id);
+        logger.warn("PUT /cards - Unsuccessful update of card details with UID " + jsonSavedCard._id + "!");
         res.send(JSON.stringify({
           "success": result,
           "error": message
@@ -194,7 +189,7 @@ secureRouter.put("/cards", function(req, res){
       else if(message==null){
         cardMethods.searchCardDetails(jsonFindCard, function(result, item, message){
           if(message){
-            console.log("Encounterd error while trying to retrieve version of the user id " + jsonSavedCard._id);
+            logger.warn("PUT /cards - Unsuccessful retrieval of version for UID " + jsonSavedCard._id + "!");
             res.send(JSON.stringify({
               "success": result,
               "error": message
@@ -209,20 +204,20 @@ secureRouter.put("/cards", function(req, res){
               }));
               cardMethods.updateCardDetails(jsonFindCard, jsonUpdateVersion, function(result, message, mongoRes){
                 if(message){
-                  console.log("Encountered an error while updating version for user id " + jsonSavedCard._id);
+                  logger.warn("PUT /cards - Unsuccessful version update for UID " + jsonSavedCard._id + "!");
                   res.send(JSON.stringify({
                     "success": result,
                     "error": message
                   }));
                 }
                 else if(message==null){
-                  console.log("Successful save of cards with change in version for user id " + jsonSavedCard._id);
+                  logger.info("PUT /cards - Card details saved successfully, with change in version, for UID " + jsonSavedCard._id + "!");
 
                   amazonS3Methods.imageUploaderEntryPoint(jsonSavedCard._id, files.profilePic, files.companyLogo, function(result, message){
                     if(message)
-                      console.log("Image upload failure!");
+                      logger.warn("PUT /cards - Failed image upload!");
                     else
-                      console.log("Image upload success!");
+                      logger.info("PUT /cards - Successful image upload!");
 
                     res.send(JSON.stringify({
                       "success": result,
@@ -234,13 +229,13 @@ secureRouter.put("/cards", function(req, res){
             }
 
             else{
-              console.log("Successful save of cards without change in version for user id " + jsonSavedCard._id);
+              logger.info("PUT /cards - Card details saved successfully, without change in version, for UID " + jsonSavedCard._id + "!");
 
               amazonS3Methods.imageUploaderEntryPoint(jsonSavedCard._id, files.profilePic, files.companyLogo, function(result, message){
                 if(message)
-                  console.log("Image upload failure!");
+                  logger.warn("PUT /cards - Failed image upload!");
                 else
-                  console.log("Image upload success!");
+                  logger.info("PUT /cards - Successful image upload!");
 
                 res.send(JSON.stringify({
                   "success": result,
