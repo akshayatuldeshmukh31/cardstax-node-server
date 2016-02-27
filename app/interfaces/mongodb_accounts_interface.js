@@ -44,6 +44,15 @@ function searchLoginDetails(jsonObjForLoginColl, callback){
 		}
 		else if(err==null && item!=null){
 			logger.info("Login Collection - Login successful for username '" + jsonObjForLoginColl.userName + "'!");
+			logger.debug(item);
+			var json = JSON.parse(JSON.stringify({
+				"cards":[]
+			}));
+			json.cards.push(JSON.stringify(item));
+			json.cards.push(JSON.stringify(item));
+			var temp = JSON.parse(json.cards[1]);
+			logger.debug(temp.status);
+			logger.debug(json);
 			callback(statusCodes.operationSuccess, item, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){

@@ -250,6 +250,29 @@ secureRouter.put("/cards", function(req, res){
   });
 });
 
+//TEST JSON playground
+secureRouter.get("/json", function(req, res){
+  var json = JSON.parse(JSON.stringify({
+    'id':'lsdkjf',
+    'key':[{'tr':'tr'},{'re':'re'}]
+  }));
+
+  var arr = [];
+  arr.push({'tr':'py'});
+  logger.debug(arr[0].tr);
+  
+  for(var i = 0;i<arr.length;i++){
+    logger.debug(arr[i]);
+  }
+  //json.key.push(json2);
+  //json.id2 = "sldkjs";
+  var json2 = json.key;
+  logger.debug(JSON.stringify(json2[1]));
+  res.setHeader('Content-Type','application/json');
+  logger.debug(JSON.stringify(json));
+  res.send(json);
+});
+
 //TEST for retrieving profile pictures
 secureRouter.get("/profilePic", function(req, res){
   var id = req.decoded._id;
@@ -298,33 +321,133 @@ secureRouter.post("/backup", function(req, res){
 
 //TODO Endpoint for retrieving backups
 secureRouter.get("/cards", function(req, res){
+
+  //Variables
+  var counter1, counter2, sentFailure, appendJsonSnippet;
+  
   res.setHeader('Content-Type', 'application/json');
-  console.log("User " + req.decoded._id + " sent a request to retrieve backup.");
   var backupFile = req.decoded._id + "-backup.json";
   amazonS3Methods.returnBackupToExpressServer(req.decoded._id, backupFile, function(result, message, data){
     if(message){
+      logger.warn("GET /cards - Failed to retrieve backup for UID " + req.decoded._id);
       res.send(JSON.stringify({
-      "success": result,
-      "error" : message
+        "success": result,
+        "error" : message
       }));
     }
     else{
       var backupData = JSON.parse(data);
       
       var jsonFindCriteriaForUser = JSON.parse(JSON.stringify({
-        "_id": backupdata._id,
+        "_id": backupData._id,
         "status": statusCodes.recordStatusAlive
       }));
 
-      cardMethods.searchCardDetails(jsonFindCriteriaForUser, function(result, message, item){
-        if(message)
-{        }
+      cardMethods.searchCardDetails(jsonFindCriteriaForUser, function(result, item, message){
+        if(message){
+          logger.warn("GET /cards - Failed to retrieve user card details for UID " + backupData._id + ": " + message);
+          res.send(JSON.stringify({
+            "success": result,
+            "error" : message
+          }));
+        }
+        else{
+          //Download pics and retrieve information
+          //Prepare JSON response to app side. Cards will store the cards of the user who has requested to retrieve the backup
+          var cardStack = JSON.parse(JSON.stringify({
+            "_id": item._id,
+            "firstName": item.firstName,
+            "lastName": item.lastName,
+            "company": item.company,
+            "companyAddress": item.companyAddress,
+            "designation": item.designation,
+            "country": item.country,
+            "version": item.version,
+            "templateId": item.templateId,
+            "changedBy": item.changedBy,
+            "changedOn": item.changedOn,
+            "cards": [],
+            "failedRetrievals": []
+          }));
+
+          //Store UIDs of images to be retrieved
+          var idForPictures = [];
+          idForPictures.push(backupData._id);
+          var cardsOfUser = backupData.cards;
+          for(var i = 0; i<cardsOfUser.length; i++){
+            idForPictures.push(cardsOfUser[i]._id);
+          }
+
+          for(var i = 0; i<cardsOfUser.length; i++){
+            var jsonFindCriteria = JSON.parse(JSON.stringify({
+              "_id": cardsOfUser[i]._id,
+              "status": statusCodes.recordStatusAlive
+            }));
+            cardMethods.searchCardDetails(jsonFindCriteria, function(result, item, message){
+              if(message){
+                logger.warn("GET /cards - Unsuccessful retrieval of card details for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+                cardStack.failedRetrievals.push(JSON.stringify({"_id": jsonFindCriteria._id}));
+              }
+              else{
+                counter1 = -2;
+                counter2 = -2;
+                sentFailure = 0;
+                appendJsonSnippet = 0;
+
+                amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message){
+                  if(message){
+                    logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+                    counter1 = 0;
+                  }
+                  else{
+                    logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
+                    counter1 = 1;
+                  }
+
+                  if(counter1==0 && sentFailure==0){
+                    sentFailure = 1;
+                    cardStack.failedRetrievals.push(JSON.stringify({"_id": jsonFindCriteria._id}));
+                  }
+                  else if(counter1==1 && counter2==1){
+                    //TODO Attach image to response body
+                    if(appendJsonSnippet==0){
+                      //Append JSON snippet to cardStack
+                      cardStack.cards.push(JSON.stringify(item));
+                      appendJsonSnippet = 1;
+                    }
+                  }
+                });
+
+                amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message){
+                  if(message){
+                    logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+                    counter2 = 0;
+                  }
+                  else{
+                    logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
+                    counter2 = 1;
+                  }
+
+                  if(counter2==0 && sentFailure==0){
+                    sentFailure = 1;
+                    cardStack.failedRetrievals.push(JSON.stringify({"_id": jsonFindCriteria._id}));
+                  }
+                  else if(counter1==1 && counter2==1){
+                    //TODO Attach image to response body
+                    if(appendJsonSnippet==0){
+                      //Append JSON snippet to cardStack
+                      cardStack.cards.push(JSON.stringify(item));
+                      appendJsonSnippet = 1;
+                    }
+                  }
+                });
+              }
+            });
+          }
+        }
       });
-
-
     }
   })
-
 });
 
 module.exports = secureRouter;

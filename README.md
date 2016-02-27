@@ -148,6 +148,18 @@ Work done till date -
 		b. profilePic (Profile picture image file)
 		c. companyLogo (Company logo image file)
 
+	savedCardDetails json format:
+
+		a. firstName
+    	b. lastName
+    	c. company
+    	d. designation
+    	e. companyAddress
+    	f. country
+    	g. templateId
+    	h. changedOn
+    	i. changedBy
+    	
 	JSON Response key values:
 
 		a. success
@@ -161,9 +173,17 @@ Work done till date -
 		a. x-access-token
 		b. Content-Type = application/json
 
-	JSON key values:
+	JSON body format:
 
-		a. Check myCard Google Group for the format of backup as given by Chintan
+		{
+			"_id": "User's ID comes here",
+			"cards": [{"_id": "Contact 1's ID", "circle": "Which circle he comes in"},
+					  {"_id": "Contact 2's ID", "circle": "Which circle he comes in"}
+					 ]
+
+		}
+
+		
 
 
 
