@@ -251,70 +251,6 @@ secureRouter.put("/cards", function(req, res){
   });
 });
 
-//TEST JSON playground
-secureRouter.get("/json", function(req, res){
-  var json = JSON.parse(JSON.stringify({
-    'id':'lsdkjf',
-    'key':[{'tr':'tr'},{'re':'re'}]
-  }));
-
-  var arr = [];
-  arr.push({'tr':'py'});
-  logger.debug(arr[0].tr);
-  
-  for(var i = 0;i<arr.length;i++){
-    logger.debug(arr[i]);
-  }
-  //json.key.push(json2);
-  //json.id2 = "sldkjs";
-  var json2 = json.key;
-  logger.debug(JSON.stringify(json2[1]));
-  res.setHeader('Content-Type','application/json');
-  logger.debug(JSON.stringify(json));
-  res.send(json);
-});
-
-//TEST for retrieving profile pictures
-secureRouter.get("/profilePic", function(req, res){
-  var id = req.decoded._id;
-  res.setHeader('Content-Type', 'application/json');
-  amazonS3Methods.returnProfilePictureToExpressServer(id, function(result, message){
-    if(message)
-      console.log("Profile picture download for id " + id + " was unsuccessful");
-    else
-      console.log("Profile picture download for id " + id + " was successful");
-
-    res.send(JSON.stringify({
-      "success": result,
-      "error" : message
-    }));
-  });
-});
-
-//TEST for retrieving company pictures
-secureRouter.get("/companyLogo", function(req, res){
-  var id = req.decoded._id;
-  var form = new formData();
-  form.append('myfield' + id, 'mylife');
-  res.set(form.getHeaders());
-  form.pipe(res);
-  
-  /*
-  res.setHeader('Content-Type', 'multipart/form-data');
-  amazonS3Methods.returnCompanyLogoToExpressServer(id, function(result, message, file){
-    if(message){
-      console.log("Company logo download for id " + id + " was unsuccessful");
-    }
-    else{
-      console.log("Company logo download for id " + id + " was successful");
-      //form.append("file", fs.createReadStream(file));
-      res.set(form.getHeaders());
-      form.pipe(res);
-    }
-  });
-*/
-});
-
 //Function to upload backup as given by the app
 secureRouter.post("/backup", function(req, res){
   res.setHeader('Content-Type', 'application/json');
@@ -331,7 +267,7 @@ secureRouter.post("/backup", function(req, res){
 secureRouter.get("/cards", function(req, res){
 
   //Variables
-  var appendJsonSnippet;
+  var appendJsonSnippet, mDone1, mDone2, done1, done2, contactRetOver = 0;
   var form = new formData();
   
   var backupFile = req.decoded._id + "-backup.json";
@@ -362,6 +298,9 @@ secureRouter.get("/cards", function(req, res){
           }));
         }
         else{
+
+          logger.debug(JSON.stringify(backupData, null, 2));
+          logger.debug(JSON.stringify(backupData.cards[0].circle));
           //Download pics and retrieve information
           //Prepare JSON response to app side. Cards will store the cards of the user who has requested to retrieve the backup
           var cardStack = JSON.parse(JSON.stringify({
@@ -380,8 +319,13 @@ secureRouter.get("/cards", function(req, res){
             "failedRetrievals": []
           }));
 
+          logger.debug(backupData.cards.length);
+          mDone1 = 0; 
+          mDone2 = 0;
+          
           //Download pics of the main user
           amazonS3Methods.returnProfilePictureToExpressServer(backupData._id, function(result, message, file){
+            mDone1 = 1;
             if(message){
               logger.warn("GET /cards - Unsuccessful retrieval of profile picture for main UID " + backupData._id + "!");
             }
@@ -390,9 +334,16 @@ secureRouter.get("/cards", function(req, res){
               //Attach image to form
               form.append(backupData._id + "-profile", fs.createReadStream(file));
             }
+
+            if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+              form.append("cardStack", JSON.stringify(cardStack));
+              res.set(form.getHeaders());
+              form.pipe(res);
+            }
           });
 
           amazonS3Methods.returnCompanyLogoToExpressServer(backupData._id, function(result, message, file){
+            mDone2 = 1;
             if(message){
               logger.warn("GET /cards - Unsuccessful retrieval of company logo for main UID " + backupData._id + "!");
             }
@@ -401,73 +352,25 @@ secureRouter.get("/cards", function(req, res){
               //Attach image to form
               form.append(backupData._id + "-company", fs.createReadStream(file));
             }
+
+            if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+              form.append("cardStack", JSON.stringify(cardStack));
+              res.set(form.getHeaders());
+              form.pipe(res);
+            }
           });
 
+          //TODO Resolve problem of asynchronity
           //Retrieve card details of the user's contacts
           for(var i = 0; i<backupData.cards.length; i++){
-            var jsonFindCriteria = JSON.parse(JSON.stringify({
-              "_id": backupData.cards[i]._id,
-              "status": statusCodes.recordStatusAlive
-            }));
-            cardMethods.searchCardDetails(jsonFindCriteria, function(result, item, message){
-              if(message){
-                logger.warn("GET /cards - Unsuccessful retrieval of card details for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
-                cardStack.failedRetrievals.push(JSON.stringify({"_id": jsonFindCriteria._id}));
+            getContactDetails(cardStack, backupData, i, form, function(){
+              if(mDone1 == 1 && mDone2 == 1 && i >= backupData.cards.length){
+                form.append("cardStack", JSON.stringify(cardStack));
+                res.set(form.getHeaders());
+                form.pipe(res);
               }
-              else{
-                appendJsonSnippet = 0;
-
-                amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file){
-                  if(message){
-                    logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
-                  }
-                  else{
-                    logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
-                    
-                    //Attach image to form
-                    form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
-                    
-                    if(appendJsonSnippet==0){
-                      //Append JSON snippet to cardStack
-                      item['circle'] = backupData.cards[i].circle;
-                      cardStack.cards.push(JSON.stringify(item));
-                      appendJsonSnippet = 1;
-
-                      //Check for final iteration
-                      if(i == backupData.cards.length - 1){
-                        form.append("cardStack", cardStack);
-                        res.set(form.getHeaders());
-                        form.pipe(res);
-                      }
-                    }
-                  }
-                });
-
-                amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file){
-                  if(message){
-                    logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
-                  }
-                  else{
-                    logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
-                    
-                    //Attach image to form
-                    form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
-                    
-                    if(appendJsonSnippet==0){
-                      //Append JSON snippet to cardStack
-                      item['circle'] = backupData.cards[i].circle;
-                      cardStack.cards.push(JSON.stringify(item));
-                      appendJsonSnippet = 1;
-
-                      //Check for final iteration
-                      if(i == backupData.cards.length - 1){
-                        form.append("cardStack", cardStack);
-                        res.set(form.getHeaders());
-                        form.pipe(res);
-                      }
-                    } 
-                  }
-                });
+              else if(i >= backupData.cards.length){
+                contactRetOver = 1;
               }
             });
           }
@@ -477,6 +380,63 @@ secureRouter.get("/cards", function(req, res){
   })
 });
 
+function getContactDetails(cardStack, backupData, i, form, callback){
+
+  var done1, done2;
+
+  var jsonFindCriteria = JSON.parse(JSON.stringify({
+    "_id": backupData.cards[i]._id,
+    "status": statusCodes.recordStatusAlive
+  }));
+
+  cardMethods.searchCardDetails(jsonFindCriteria, function(result, contact, message){
+    logger.debug("IN here again" + i);
+    if(message){
+      logger.warn("GET /cards - Unsuccessful retrieval of card details for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+      cardStack.failedRetrievals.push(JSON.stringify({"_id": jsonFindCriteria._id}));
+    }
+    else{
+
+      contact.circle = backupData.cards[i].circle;
+      cardStack.cards.push(contact);
+                
+      done1 = 0;
+      done2 = 0;
+
+      amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file){
+        done1 = 1;
+        if(message){
+          logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+        }
+        else{
+          logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
+                    
+          //Attach image to form
+          form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
+
+          if(done1 == 1 && done2 == 1)
+            callback();
+        }
+      });
+
+      amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file){
+        done2 = 1;
+        if(message){
+          logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+        }
+        else{
+          logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
+                    
+          //Attach image to form
+          form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
+          
+          if(done1 == 1 && done2 == 1)
+            callback();
+        }
+      });
+    }
+  });
+}
 module.exports = secureRouter;
 
 

@@ -159,7 +159,7 @@ Work done till date -
     	g. templateId
     	h. changedOn
     	i. changedBy
-    	
+
 	JSON Response key values:
 
 		a. success
@@ -184,6 +184,36 @@ Work done till date -
 		}
 
 		
+* Developed endpoint to retrieve backup of a user's cardstack which includes his/her contact details along with the corresponding pictures.
+
+	HTTP Request Header key values:
+
+		a. x-access-token
+
+	JSON Response body:
+
+		Information is returned as a multipart form. The key values of images are:
+
+		a. UID-profile	(Consider UID to be the UID of the contact)
+		b. UID-company	(Consider UID to be the UID of the contact)
+		c. cardStack  	(JSON)
+
+		cardStack includes the following fields:
+
+		a. _id
+		b. firstName
+    	c. lastName
+    	d. company
+    	e. designation
+    	f. companyAddress
+    	g. country
+    	h. templateId
+    	i. changedOn
+    	j. changedBy
+    	k. cards 			(An array of contacts of the users. Has the same contents, from a. to j., along with an additional field called 'circle')
+    	l. failedRetrievals	(An array which consists of UIDs of contacts)
+
+    	Please note that failedRetrievals will be filled ONLY in the case of unsuccessful retrieval of card details from MongoDB. IT WILL NOT ACKNOWLEDGE UNSUCCESSFUL RETRIEVAL OF IMAGES AS INFORMATION FROM MONGODB CAN STILL BE SUFFICIENT FOR INFO ABOUT THE PARTICULAR CONTACT!!! Image retrievals can fail due to lack of internet connection, faults at Amazon and the non-existence of an image if that contact hasn't uploaded any image.
 
 
 
@@ -249,7 +279,9 @@ Work done till date -
 
 6. URI for saving card details - /secure/cards 	(HTTP METHOD - PUT)
 
-6. URI for saving backup - /secure/backup		(HTTP METHOD - POST)
+7. URI for saving backup - /secure/backup		(HTTP METHOD - POST)
+
+8. URI for retrieving backups - /secure/cards 	(HTTP METHOD - GET)
 
 
 *** Naming Convention for Files in Amazon S3 ***

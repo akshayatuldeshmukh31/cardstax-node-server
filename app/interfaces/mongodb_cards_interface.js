@@ -43,11 +43,11 @@ function searchCardDetails(jsonObjForMasterColl, callback){
 			return callback(statusCodes.operationError, item, err);
 		}
 		else if(err==null && item!=null){
-			logger.warn("Master Collection - Card details retrieved successfully for UID " + jsonObjForMasterColl._id + "!");
+			logger.info("Master Collection - Card details retrieved successfully for UID " + jsonObjForMasterColl._id + "!");
 			return callback(statusCodes.operationSuccess, item, statusCodes.successMessage);
 		}
 		else if(err==null && item==null){
-			logger.info("Master Collection - No such data pertaining to UID " + jsonObjForMasterColl._id);
+			logger.warn("Master Collection - No such data pertaining to UID " + jsonObjForMasterColl._id);
 			return callback(statusCodes.dataNotFound, item, statusCodes.dataNotFoundErrorMessage);	
 		}
 	});

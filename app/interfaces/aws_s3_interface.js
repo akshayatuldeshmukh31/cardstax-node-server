@@ -120,7 +120,6 @@ function returnCompanyLogoToExpressServer(id, callback){
       callback(statusCodes.operationError, err, null);
     }
     else if(data){
-      logger.debug(data.Body);
       var companyLogoExt = data.ContentType.split('/').pop();
       var file = __dirname + "/../downloads/" + key + "." + companyLogoExt;
 
