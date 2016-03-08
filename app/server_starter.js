@@ -10,7 +10,6 @@
 */
 
 var environmentVariables = require("./../config/environmentVariables");
-var config = require("./../config/config");
 var mongoAccountsInterface = require("./interfaces/mongodb_accounts_interface");
 var mongoCardsInterface = require("./interfaces/mongodb_cards_interface");
 var routeIndex = require("./routes/index");
@@ -23,7 +22,7 @@ var app = express();
 //For MongoDB
 var mongodb = require("mongodb");
 var MongoClient = mongodb.MongoClient;
-var uri = config.database;
+var uri = environmentVariables.database;
 var database = null;
 var loginCollection = null;
 var masterCollection = null;
