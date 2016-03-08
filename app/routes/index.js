@@ -26,7 +26,7 @@ function loadAppRoutes(app){
 	//Load routes which require authorization (secured access)
 	app.use("/secure", securedRoutes);
 
-	//TEST route
+	//TEST route for checking successful deployment
 	app.get("/", function(req,res){
 		res.send("Hello! You have reached the index.");
 	});
