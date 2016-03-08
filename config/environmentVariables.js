@@ -11,9 +11,6 @@ logout = "/logout";
 
 userCardOperation = "card";
 
-//AWS related variables
-profilePictureBucket = "mp-profile-picture";
-
 exports.portNo = portNo;
 exports.database = database;
 exports.mongoLoginDetailsCollectionName = mongoLoginDetailsCollectionName;
@@ -26,6 +23,3 @@ exports.updateLoginAccount = updateLoginAccount;
 exports.logout = logout;
 
 exports.userCardOperation = userCardOperation;
-
-//Export of AWS related variables
-exports.profilePictureBucket = profilePictureBucket;

@@ -9,7 +9,6 @@
 
 var AWS = require("aws-sdk");
 var fs = require("fs");
-var environmentVariables = require("./../../config/environmentVariables");
 var configuration = require("./../../config/config");
 var awsConfig = require("./../../config/aws_config.json");
 var statusCodes = require("./../status_codes");
