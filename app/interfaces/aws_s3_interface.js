@@ -15,7 +15,7 @@ var statusCodes = require("./../status_codes");
 var logger = require("./../../config/logger");
 
 //AWS configuration
-AWS.config.loadFromPath(__dirname + "./../../config/aws_config.json");
+AWS.config.loadFromPath(__dirname + "/../../config/aws_config.json");
 
 var s3 = new AWS.S3();
 var profilePicBucket = configuration.awsProfilePicBucket;
