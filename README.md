@@ -218,14 +218,6 @@ Work done till date -
 
 
 
-* Implemented test implementation of JSON Web Tokens (Authentication + Sessions). To be expanded and tested... (ATTENTION!!)
-
-	How tokens can be sent from the app:
-
-		a. SEND TOKEN AS A KEY-VALUE PAIR IN THE REQUEST HEADER WITH THE KEY VALUE AS "x-access-token"
-
-
-
 *** STATUS CODES (RESPONSES AS RECEIVED BY THE APP) ***
 
 * Token Authorization

@@ -379,7 +379,7 @@ secureRouter.get("/cards", function(req, res){
 
 function getContactDetails(cardStack, backupData, i, form, callback){
 
-  var done1, done2;
+  var done1 = 0, done2 = 0;
 
   var jsonFindCriteria = JSON.parse(JSON.stringify({
     "_id": backupData.cards[i]._id,
@@ -389,15 +389,15 @@ function getContactDetails(cardStack, backupData, i, form, callback){
   cardMethods.searchCardDetails(jsonFindCriteria, function(result, contact, message){
     if(message){
       logger.warn("GET /cards - Unsuccessful retrieval of card details for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
-      cardStack.failedRetrievals.push(JSON.stringify({"_id": jsonFindCriteria._id}));
+      cardStack.failedRetrievals.push(JSON.parse(JSON.stringify({"_id": jsonFindCriteria._id})));
+      done1 = 1;
+      done2 = 1;
+      callback();
     }
     else{
 
       contact.circle = backupData.cards[i].circle;
       cardStack.cards.push(contact);
-                
-      done1 = 0;
-      done2 = 0;
 
       amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file){
         done1 = 1;
