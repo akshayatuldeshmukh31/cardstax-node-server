@@ -1,4 +1,4 @@
-portNo = 8888;
+portNo = process.env.PORTNO || 8800;
 //mongoDbUri = "mongodb://127.0.0.1:27017/master_server";
 mongoLoginDetailsCollectionName = "login_details";
 mongoMasterCollectionName = "master_collection";

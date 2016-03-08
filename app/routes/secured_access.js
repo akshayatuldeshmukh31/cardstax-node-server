@@ -299,8 +299,6 @@ secureRouter.get("/cards", function(req, res){
         }
         else{
 
-          logger.debug(JSON.stringify(backupData, null, 2));
-          logger.debug(JSON.stringify(backupData.cards[0].circle));
           //Download pics and retrieve information
           //Prepare JSON response to app side. Cards will store the cards of the user who has requested to retrieve the backup
           var cardStack = JSON.parse(JSON.stringify({
@@ -319,7 +317,6 @@ secureRouter.get("/cards", function(req, res){
             "failedRetrievals": []
           }));
 
-          logger.debug(backupData.cards.length);
           mDone1 = 0; 
           mDone2 = 0;
           
@@ -390,7 +387,6 @@ function getContactDetails(cardStack, backupData, i, form, callback){
   }));
 
   cardMethods.searchCardDetails(jsonFindCriteria, function(result, contact, message){
-    logger.debug("IN here again" + i);
     if(message){
       logger.warn("GET /cards - Unsuccessful retrieval of card details for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
       cardStack.failedRetrievals.push(JSON.stringify({"_id": jsonFindCriteria._id}));
