@@ -1,4 +1,4 @@
-portNo = process.env.PORTNO || 8800;
+portNo = process.env.PORT || 8800;
 database = process.env.MONGOLAB_URI || "mongodb://127.0.0.1:27017/master_server";
 mongoLoginDetailsCollectionName = "login_details";
 mongoMasterCollectionName = "master_collection";
