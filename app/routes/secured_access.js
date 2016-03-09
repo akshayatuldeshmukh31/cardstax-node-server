@@ -337,10 +337,6 @@ secureRouter.get("/cards", function(req, res){
             }
 
             if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-              for(var i = 0; i<deletePics.cards.length; i++){
-                deletePictures(deletePics, i);
-              } 
-
               form.append("cardStack", JSON.stringify(cardStack));
               res.set(form.getHeaders());
               form.pipe(res);
@@ -360,10 +356,6 @@ secureRouter.get("/cards", function(req, res){
             }
 
             if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-              for(var i = 0; i<deletePics.cards.length; i++){
-                deletePictures(deletePics, i);
-              }
-          
               form.append("cardStack", JSON.stringify(cardStack));
               res.set(form.getHeaders());
               form.pipe(res);
@@ -374,10 +366,6 @@ secureRouter.get("/cards", function(req, res){
           for(var i = 0; i<backupData.cards.length; i++){
             getContactDetails(cardStack, backupData, i, form, function(){
               if(mDone1 == 1 && mDone2 == 1 && i >= backupData.cards.length){
-                for(var i = 0; i<deletePics.cards.length; i++){
-                  deletePictures(deletePics, i);
-                } 
-                
                 form.append("cardStack", JSON.stringify(cardStack));
                 res.set(form.getHeaders());
                 form.pipe(res);
@@ -424,7 +412,7 @@ function getContactDetails(cardStack, backupData, i, form, callback){
           //Attach image to form
           form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
-
+          
           if(done1 == 1 && done2 == 1)
             callback();
         }
@@ -447,17 +435,6 @@ function getContactDetails(cardStack, backupData, i, form, callback){
         }
       });
     }
-  });
-}
-
-//Function to delete pictures from server memory
-function deletePictures(deletePics, i){
-  
-  fs.unlink(deletePics.cards[i].file, function(err){
-    if(err)
-      logger.error("Server - Error in deleting " + deletePics.cards[i].file + " : " + err);
-    else
-      logger.info("Server - Successfully deleted " + deletePics.cards[i].file);
   });
 }
 module.exports = secureRouter;
