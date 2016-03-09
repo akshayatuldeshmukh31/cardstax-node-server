@@ -426,8 +426,12 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
                     
           //Attach image to form
-          form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
+          var x = form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+
+          x.on('finish', function(){
+            logger.debug("I AM DONE APPENDING");
+          });
 
           if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1))
             callback();
@@ -444,9 +448,13 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
                     
           //Attach image to form
-          form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
+          var y = form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
+          y.on('finish', function(){
+            logger.debug("I AM DONE APPENDING");
+          });
+          
           if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1))
             callback();
         }
