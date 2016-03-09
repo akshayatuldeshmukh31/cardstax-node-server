@@ -339,7 +339,12 @@ secureRouter.get("/cards", function(req, res){
             if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
               form.append("cardStack", JSON.stringify(cardStack));
               res.set(form.getHeaders());
-              form.pipe(res);
+              var stream = form.pipe(res);
+
+              stream.on("finish", function(){
+                for(var i = 0; i<deletePics.cards.length; i++)
+                  deletePictures(deletePics, i);
+              });
             }
           });
 
@@ -358,7 +363,12 @@ secureRouter.get("/cards", function(req, res){
             if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
               form.append("cardStack", JSON.stringify(cardStack));
               res.set(form.getHeaders());
-              form.pipe(res);
+              var stream = form.pipe(res);
+
+              stream.on("finish", function(){
+                for(var i = 0; i<deletePics.cards.length; i++)
+                  deletePictures(deletePics, i);
+              });
             }
           });
 
@@ -368,7 +378,12 @@ secureRouter.get("/cards", function(req, res){
               if(mDone1 == 1 && mDone2 == 1 && i >= backupData.cards.length){
                 form.append("cardStack", JSON.stringify(cardStack));
                 res.set(form.getHeaders());
-                form.pipe(res);
+                var stream = form.pipe(res);
+
+                stream.on("finish", function(){
+                  for(var i = 0; i<deletePics.cards.length; i++)
+                    deletePictures(deletePics, i);
+                });
               }
               else if(i >= backupData.cards.length){
                 contactRetOver = 1;
@@ -435,6 +450,15 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
         }
       });
     }
+  });
+}
+
+function deletePictures(deletePics, i){
+  fs.unlink(deletePics.cards[i].file, function(err){
+    if(err)
+      logger.err("Server - Error in deleting " + deletePics.cards[i].file);
+    else
+      logger.info("Server - Successfully deleted " + deletePics.cards[i].file);
   });
 }
 module.exports = secureRouter;
