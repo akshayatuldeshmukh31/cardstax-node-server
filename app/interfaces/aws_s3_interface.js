@@ -40,12 +40,12 @@ function uploadProfilePicture(filePath, fileName, fileMimeType, callback){
           		}     
         			else{
           			logger.info("Cloud - Successfully uploaded file " + fileName + " to " + profilePicBucket + "/" + filePath);
-                      fs.unlink(filePath, function(err){
-                          if(err)
-                              logger.error("Cloud - Error in deleting file " + fileName + ": " + err);
-                          else
-                              logger.info("Cloud - " + fileName + " deleted successfully!");
-                      });
+                fs.unlink(filePath, function(err){
+                  if(err)
+                    logger.error("Cloud - Error in deleting file " + fileName + ": " + err);
+                  else
+                    logger.info("Cloud - " + fileName + " deleted successfully!");
+                });
           			return callback(statusCodes.operationSuccess, null);   
           		}
      			});    	

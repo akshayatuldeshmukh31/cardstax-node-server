@@ -317,6 +317,9 @@ secureRouter.get("/cards", function(req, res){
             "failedRetrievals": []
           }));
 
+          var deletePics = JSON.parse(JSON.stringify({
+            "cards": []
+          }));
           mDone1 = 0; 
           mDone2 = 0;
           
@@ -330,9 +333,13 @@ secureRouter.get("/cards", function(req, res){
               logger.info("GET /cards - Successful retrieval of profile picture for main UID " + backupData._id + "!")
               //Attach image to form
               form.append(backupData._id + "-profile", fs.createReadStream(file));
+              deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
             }
 
             if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+              //Delete pics from server memory
+              deletePictures(deletePics);
+              
               form.append("cardStack", JSON.stringify(cardStack));
               res.set(form.getHeaders());
               form.pipe(res);
@@ -348,20 +355,26 @@ secureRouter.get("/cards", function(req, res){
               logger.info("GET /cards - Successful retrieval of company logo for main UID " + backupData._id + "!");
               //Attach image to form
               form.append(backupData._id + "-company", fs.createReadStream(file));
+              deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
             }
 
             if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+              //Delete pics from server memory
+              deletePictures(deletePics);
+              
               form.append("cardStack", JSON.stringify(cardStack));
               res.set(form.getHeaders());
               form.pipe(res);
             }
           });
 
-          //TODO Resolve problem of asynchronity
           //Retrieve card details of the user's contacts
           for(var i = 0; i<backupData.cards.length; i++){
             getContactDetails(cardStack, backupData, i, form, function(){
               if(mDone1 == 1 && mDone2 == 1 && i >= backupData.cards.length){
+                //Delete pics from server memory
+                deletePictures(deletePics);
+
                 form.append("cardStack", JSON.stringify(cardStack));
                 res.set(form.getHeaders());
                 form.pipe(res);
@@ -390,8 +403,6 @@ function getContactDetails(cardStack, backupData, i, form, callback){
     if(message){
       logger.warn("GET /cards - Unsuccessful retrieval of card details for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
       cardStack.failedRetrievals.push(JSON.parse(JSON.stringify({"_id": jsonFindCriteria._id})));
-      done1 = 1;
-      done2 = 1;
       callback();
     }
     else{
@@ -409,6 +420,7 @@ function getContactDetails(cardStack, backupData, i, form, callback){
                     
           //Attach image to form
           form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
+          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
           if(done1 == 1 && done2 == 1)
             callback();
@@ -425,13 +437,27 @@ function getContactDetails(cardStack, backupData, i, form, callback){
                     
           //Attach image to form
           form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
-          
+          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+
           if(done1 == 1 && done2 == 1)
             callback();
         }
       });
     }
   });
+}
+
+//Function to delete pictures from server memory
+function deletePictures(deletePics){
+  logger.debug(JSON.stringify(deletePics, null, 2));
+  for(var i = 0; i<deletePics.cards.length; i++){
+    fs.unlink(deletePics.cards[i].file, function(err){
+      if(err)
+        logger.error("Server - Error in deleting " + deletePics.cards[i].file + " : " + err);
+      else
+        logger.info("Server - Successfully deleted " + deletePics.cards[i].file);
+    });
+  }
 }
 module.exports = secureRouter;
 
