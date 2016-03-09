@@ -417,35 +417,37 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
       cardStack.cards.push(contact);
 
       amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file){
-        done1 = 1;
         if(message){
+          done1 = -1;
           logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
         }
         else{
+          done1 = 1
           logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
                     
           //Attach image to form
           form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
-          if(done1 == 1 && done2 == 1)
+          if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1))
             callback();
         }
       });
 
       amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file){
-        done2 = 1;
         if(message){
+          done2 = -1;
           logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
         }
         else{
+          done2 = 1
           logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
                     
           //Attach image to form
           form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
-          if(done1 == 1 && done2 == 1)
+          if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1))
             callback();
         }
       });
