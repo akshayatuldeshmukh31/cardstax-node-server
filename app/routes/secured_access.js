@@ -332,17 +332,21 @@ secureRouter.get("/cards", function(req, res){
             else{
               logger.info("GET /cards - Successful retrieval of profile picture for main UID " + backupData._id + "!")
               //Attach image to form
+              logger.debug(fs.createReadStream(file));
               form.append(backupData._id + "-profile", fs.createReadStream(file));
               deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
             }
 
             if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-              //Delete pics from server memory
-              deletePictures(deletePics);
               
               form.append("cardStack", JSON.stringify(cardStack));
               res.set(form.getHeaders());
-              form.pipe(res);
+              var stream = form.pipe(res);
+
+              stream.on('finish', function(){
+                //Delete pics from server memory
+                deletePictures(deletePics);
+              });
             }
           });
 
@@ -359,12 +363,15 @@ secureRouter.get("/cards", function(req, res){
             }
 
             if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-              //Delete pics from server memory
-              deletePictures(deletePics);
               
               form.append("cardStack", JSON.stringify(cardStack));
               res.set(form.getHeaders());
-              form.pipe(res);
+              var stream = form.pipe(res);
+
+              stream.on('finish', function(){
+                //Delete pics from server memory
+                deletePictures(deletePics);
+              });
             }
           });
 
@@ -372,12 +379,15 @@ secureRouter.get("/cards", function(req, res){
           for(var i = 0; i<backupData.cards.length; i++){
             getContactDetails(cardStack, backupData, i, form, function(){
               if(mDone1 == 1 && mDone2 == 1 && i >= backupData.cards.length){
-                //Delete pics from server memory
-                deletePictures(deletePics);
-
+                
                 form.append("cardStack", JSON.stringify(cardStack));
                 res.set(form.getHeaders());
                 form.pipe(res);
+
+                stream.on('finish', function(){
+                  //Delete pics from server memory
+                  deletePictures(deletePics);
+                });
               }
               else if(i >= backupData.cards.length){
                 contactRetOver = 1;
@@ -450,12 +460,15 @@ function getContactDetails(cardStack, backupData, i, form, callback){
 //Function to delete pictures from server memory
 function deletePictures(deletePics){
   logger.debug(JSON.stringify(deletePics, null, 2));
+  var fileName;
+  
   for(var i = 0; i<deletePics.cards.length; i++){
-    fs.unlink(deletePics.cards[i].file, function(err){
+    fileName = deletePics.cards[i].file;
+    fs.unlink(fileName, function(err){
       if(err)
-        logger.error("Server - Error in deleting " + deletePics.cards[i].file + " : " + err);
+        logger.error("Server - Error in deleting " + fileName + " : " + err);
       else
-        logger.info("Server - Successfully deleted " + deletePics.cards[i].file);
+        logger.info("Server - Successfully deleted " + fileName);
     });
   }
 }
