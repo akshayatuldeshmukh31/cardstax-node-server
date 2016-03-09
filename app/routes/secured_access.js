@@ -456,7 +456,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
 function deletePictures(deletePics, i){
   fs.unlink(deletePics.cards[i].file, function(err){
     if(err)
-      logger.err("Server - Error in deleting " + deletePics.cards[i].file);
+      logger.error("Server - Error in deleting " + deletePics.cards[i].file);
     else
       logger.info("Server - Successfully deleted " + deletePics.cards[i].file);
   });
