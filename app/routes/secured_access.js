@@ -364,7 +364,7 @@ secureRouter.get("/cards", function(req, res){
 
           //Retrieve card details of the user's contacts
           for(var i = 0; i<backupData.cards.length; i++){
-            getContactDetails(cardStack, backupData, i, form, function(){
+            getContactDetails(cardStack, backupData, i, form, deletePics, function(){
               if(mDone1 == 1 && mDone2 == 1 && i >= backupData.cards.length){
                 form.append("cardStack", JSON.stringify(cardStack));
                 res.set(form.getHeaders());
@@ -381,7 +381,7 @@ secureRouter.get("/cards", function(req, res){
   })
 });
 
-function getContactDetails(cardStack, backupData, i, form, callback){
+function getContactDetails(cardStack, backupData, i, form, deletePics, callback){
 
   var done1 = 0, done2 = 0;
 
@@ -412,7 +412,7 @@ function getContactDetails(cardStack, backupData, i, form, callback){
           //Attach image to form
           form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
-          
+
           if(done1 == 1 && done2 == 1)
             callback();
         }
