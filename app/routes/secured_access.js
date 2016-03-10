@@ -56,6 +56,7 @@ secureRouter.use(function(req, res, next){
 
     	// if there is no token
     	// return an error
+      logger.debug("SENT FAILED AUTH");
     	return res.status(403).json({ 
        		"success": statusCodes.authenticationTokenNotProvided, 
         	"error": statusCodes.authenticationTokenNotProvidedErrorMessage 
