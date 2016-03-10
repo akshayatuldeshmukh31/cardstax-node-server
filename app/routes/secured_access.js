@@ -169,6 +169,8 @@ secureRouter.put("/cards", function(req, res){
     "designation": jsonSavedCard.designation,
     "companyAddress": jsonSavedCard.companyAddress,
     "country": jsonSavedCard.country,
+    "email": jsonSavedCard.email,
+    "phoneNumber": jsonSavedCard.phoneNumber,
     "templateId": jsonSavedCard.templateId,
     "changedOn": jsonSavedCard.changedOn,
     "changedBy": jsonSavedCard.changedBy
@@ -214,17 +216,25 @@ secureRouter.put("/cards", function(req, res){
                 else if(message==null){
                   logger.info("PUT /cards - Card details saved successfully, with change in version, for UID " + jsonSavedCard._id + "!");
 
-                  amazonS3Methods.imageUploaderEntryPoint(jsonSavedCard._id, files.profilePic, files.companyLogo, function(result, message){
-                    if(message)
-                      logger.warn("PUT /cards - Failed image upload!");
-                    else
-                      logger.info("PUT /cards - Successful image upload!");
-
+                  if(files.profilePic || files.companyLogo){
+                    amazonS3Methods.imageUploaderEntryPoint(jsonSavedCard._id, files.profilePic, files.companyLogo, function(result, message){
+                      if(message)
+                        logger.warn("PUT /cards - Failed image upload!");
+                      else
+                        logger.info("PUT /cards - Successful image upload!");
+                  
+                      res.send(JSON.stringify({
+                        "success": result,
+                        "error": message
+                      }));
+                    });
+                  }
+                  else{
                     res.send(JSON.stringify({
                       "success": result,
                       "error": message
                     }));
-                  });
+                  }
                 }
               });
             }
@@ -232,17 +242,25 @@ secureRouter.put("/cards", function(req, res){
             else{
               logger.info("PUT /cards - Card details saved successfully, without change in version, for UID " + jsonSavedCard._id + "!");
 
-              amazonS3Methods.imageUploaderEntryPoint(jsonSavedCard._id, files.profilePic, files.companyLogo, function(result, message){
-                if(message)
-                  logger.warn("PUT /cards - Failed image upload!");
-                else
-                  logger.info("PUT /cards - Successful image upload!");
-
+              if(files.profilePic || files.companyLogo){
+                amazonS3Methods.imageUploaderEntryPoint(jsonSavedCard._id, files.profilePic, files.companyLogo, function(result, message){
+                  if(message)
+                    logger.warn("PUT /cards - Failed image upload!");
+                  else
+                    logger.info("PUT /cards - Successful image upload!");
+                  
+                  res.send(JSON.stringify({
+                    "success": result,
+                    "error": message
+                  }));
+                });
+              }
+              else{
                 res.send(JSON.stringify({
                   "success": result,
                   "error": message
                 }));
-              });           
+              }           
             }  
           }
         });
@@ -309,6 +327,8 @@ secureRouter.get("/cards", function(req, res){
             "companyAddress": item.companyAddress,
             "designation": item.designation,
             "country": item.country,
+            "email": item.email,
+            "phoneNumber": item.phoneNumber,
             "version": item.version,
             "templateId": item.templateId,
             "changedBy": item.changedBy,
