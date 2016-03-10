@@ -81,6 +81,7 @@ Work done till date -
 		a. success 
 		b. error 
 		c. ID of the logged in user (_id)
+		d. token
 
 
 
@@ -123,6 +124,10 @@ Work done till date -
 
 
 * Developed logout function to check for Internet connectivity (App is responsible for deleting the token from shared preferences after receiving the response from the server)
+
+	HTTP header key values:
+
+		a. x-access-token
 
 	JSON Request key values: 
 
