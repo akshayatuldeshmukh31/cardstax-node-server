@@ -157,9 +157,11 @@ Work done till date -
     	e. designation
     	f. companyAddress
     	g. country
-    	h. templateId
-    	i. changedOn
-    	j. changedBy
+    	h. email
+    	i. phoneNumber
+    	j. templateId
+    	k. changedOn
+    	l. changedBy
 
 	JSON Response key values:
 
