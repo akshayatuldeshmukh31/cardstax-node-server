@@ -29,6 +29,7 @@ var logger = require("./../../config/logger");
 //Router middleware for checking validity of token (CHECKPOINT)
 secureRouter.use(function(req, res, next){
 
+    console.log(req.headers);
     //Check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
@@ -96,7 +97,6 @@ secureRouter.put("/update", function(req, res){
 //To delete a user account...basically to change the status of the account to CLOSED
 secureRouter.delete("/remove", function(req,res){
   
-  logger.info(req.headers);
   console.log(req.headers);
   logger.info("DELETE /remove - JSON received: " + JSON.stringify(req.body,null,2));
 
