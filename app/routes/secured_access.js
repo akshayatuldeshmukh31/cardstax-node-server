@@ -96,7 +96,7 @@ secureRouter.put("/update", function(req, res){
 //To delete a user account...basically to change the status of the account to CLOSED
 secureRouter.delete("/remove", function(req,res){
   
-  console.log("DELETE /remove - JSON received: " + JSON.stringify(req.body,null,2));
+  logger.info("DELETE /remove - JSON received: " + JSON.stringify(req.body,null,2));
 
   var jsonUpdateCriteria = JSON.parse(JSON.stringify({
     "_id": req.body._id,
