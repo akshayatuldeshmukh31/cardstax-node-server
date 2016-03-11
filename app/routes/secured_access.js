@@ -39,10 +39,12 @@ secureRouter.use(function(req, res, next){
     	// verifies secret and checks expiration time
     	jwt.verify(token, config.secret, function(err, decoded) {      
       	if (err) {
-        	return res.json({ 
-        		"success": statusCodes.authenticationFailure, 
-        		"error": statusCodes.authenticationFailureErrorMessage 
-        	});    
+          res.setHeader('Content-Type', 'application/json');
+          res.statusCode = 404;
+          res.send(JSON.stringify({
+            "success": statusCodes.authenticationFailure, 
+            "error": statusCodes.authenticationFailureErrorMessage
+          }));  
       	} 
       	else {
         	// if everything is good, save to request for use in other routes
@@ -57,10 +59,12 @@ secureRouter.use(function(req, res, next){
     	// if there is no token
     	// return an error
       logger.debug("SENT FAILED AUTH");
-    	return res.status(403).json({ 
-       		"success": statusCodes.authenticationTokenNotProvided, 
-        	"error": statusCodes.authenticationTokenNotProvidedErrorMessage 
-    	});
+      res.setHeader('Content-Type', 'application/json');
+      res.statusCode = 404;
+      res.send(JSON.stringify({
+        "success": statusCodes.authenticationTokenNotProvided, 
+        "error": statusCodes.authenticationTokenNotProvidedErrorMessage 
+      }));
   	}
 });
 

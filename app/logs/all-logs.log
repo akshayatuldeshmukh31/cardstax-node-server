@@ -850,3 +850,18 @@
 {"level":"info","message":"Cloud - Successful upload of profile picture for UID 056462c2-7295-426d-9e35-69686d01d683","timestamp":"2016-03-10T15:42:33.770Z"}
 {"level":"info","message":"PUT /cards - Successful image upload!","timestamp":"2016-03-10T15:42:33.771Z"}
 {"level":"info","message":"Cloud - 056462c2-7295-426d-9e35-69686d01d683-profile deleted successfully!","timestamp":"2016-03-10T15:42:33.775Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-11T10:29:12.176Z"}
+{"level":"error","message":"MongoDB Server - Error in connecting to database: MongoError: connect ECONNREFUSED 127.0.0.1:27017","timestamp":"2016-03-11T10:29:13.208Z"}
+{"level":"info","message":"POST /login - JSON received: {\n  \"userName\": \"soloreturns\",\n  \"password\": \"5653c6b1f51852a6351ec69c8452abc6\"\n}","timestamp":"2016-03-11T10:31:51.770Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-11T10:33:24.412Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-03-11T10:33:24.450Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-03-11T10:33:24.583Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-03-11T10:33:24.586Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-03-11T10:33:24.590Z"}
+{"level":"info","message":"POST /login - JSON received: {\n  \"userName\": \"soloreturns\",\n  \"password\": \"5653c6b1f51852a6351ec69c8452abc6\"\n}","timestamp":"2016-03-11T10:33:30.661Z"}
+{"level":"info","message":"Login Collection - Login successful for username 'soloreturns'!","timestamp":"2016-03-11T10:33:30.943Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-11T10:53:00.290Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-03-11T10:53:00.329Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-03-11T10:53:00.337Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-03-11T10:53:00.338Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-03-11T10:53:00.339Z"}
