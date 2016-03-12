@@ -109,12 +109,7 @@ Work done till date -
 
 	HTTP header key values:
 
-		a. Content-Type = application/json
-		b. x-access-token
-
-	JSON Request key values:
-
-		a. _id
+		a. x-access-token
 
 	JSON Response key values:
 

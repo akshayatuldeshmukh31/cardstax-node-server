@@ -103,10 +103,10 @@ secureRouter.put("/update", function(req, res){
 secureRouter.delete("/remove", function(req,res){
   
   console.log(req.headers);
-  logger.info("DELETE /remove - JSON received: " + JSON.stringify(req.body,null,2));
+  logger.info("DELETE /remove - ID received: " + req.decoded._id);
 
   var jsonUpdateCriteria = JSON.parse(JSON.stringify({
-    "_id": req.body._id,
+    "_id": req.decoded._id,
     "status": statusCodes.recordStatusAlive
   }));
 
@@ -123,9 +123,9 @@ secureRouter.delete("/remove", function(req,res){
       userAccountMethods.updateLoginDetails(jsonUpdateCriteria, jsonUpdatedStatus, function(result, message){
       
         if(message)
-          logger.warn("DELETE /remove - Unsuccessful removal of record with UID " + req.body._id + "!");
+          logger.warn("DELETE /remove - Unsuccessful removal of record with UID " + req.decoded._id + "!");
         else
-          logger.info("DELETE /remove - Successful removal of record with UID " + req.body._id + "!");
+          logger.info("DELETE /remove - Successful removal of record with UID " + req.decoded._id + "!");
         
         res.send(JSON.stringify({
             "success": result,
@@ -134,7 +134,7 @@ secureRouter.delete("/remove", function(req,res){
       }); 
     }
     else{
-      logger.warn("DELETE /remove - Unsuccessful deletion of record with UID " + req.body._id + "!");
+      logger.warn("DELETE /remove - Unsuccessful deletion of record with UID " + req.decoded._id + "!");
       res.send(JSON.stringify({
         "success": result,
         "error": message
