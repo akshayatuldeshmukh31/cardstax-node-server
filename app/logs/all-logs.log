@@ -865,3 +865,33 @@
 {"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-03-11T10:53:00.337Z"}
 {"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-03-11T10:53:00.338Z"}
 {"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-03-11T10:53:00.339Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-12T08:31:37.050Z"}
+{"level":"error","message":"MongoDB Server - Error in connecting to database: MongoError: connect ECONNREFUSED 127.0.0.1:27017","timestamp":"2016-03-12T08:31:38.132Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-12T08:31:45.452Z"}
+{"level":"error","message":"MongoDB Server - Error in connecting to database: MongoError: connect ECONNREFUSED 127.0.0.1:27017","timestamp":"2016-03-12T08:31:46.473Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-12T08:32:13.245Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-03-12T08:32:13.282Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-03-12T08:32:13.290Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-03-12T08:32:13.291Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-03-12T08:32:13.292Z"}
+{"level":"info","message":"GET /register - JSON for login collection: {\n  \"_id\": \"72723578-0685-4a62-87a2-78b8250b0787\",\n  \"userName\": \"rahul\",\n  \"password\": \"rahul\",\n  \"channel\": \"android\",\n  \"status\": \"ALIVE\"\n}","timestamp":"2016-03-12T08:32:55.454Z"}
+{"level":"info","message":"GET /register - JSON for master collection: {\n  \"_id\": \"72723578-0685-4a62-87a2-78b8250b0787\",\n  \"firstName\": \"Rahul\",\n  \"lastName\": \"Gandhi\",\n  \"version\": 0,\n  \"status\": \"ALIVE\"\n}","timestamp":"2016-03-12T08:32:55.456Z"}
+{"level":"info","message":"Login Collection - Registration successful for UID 72723578-0685-4a62-87a2-78b8250b0787!","timestamp":"2016-03-12T08:32:55.539Z"}
+{"level":"info","message":"POST /register - Login details created successfully for UID 72723578-0685-4a62-87a2-78b8250b0787!","timestamp":"2016-03-12T08:32:55.540Z"}
+{"level":"info","message":"Master Collection - Registration successful for UID 72723578-0685-4a62-87a2-78b8250b0787!","timestamp":"2016-03-12T08:32:55.545Z"}
+{"level":"info","message":"POST /register - Master details created successfully for UID 72723578-0685-4a62-87a2-78b8250b0787!","timestamp":"2016-03-12T08:32:55.546Z"}
+{"level":"info","message":"GET /register - JSON for login collection: {\n  \"_id\": \"1a0a3e30-f6a0-40d1-a5bf-1e434d60caee\",\n  \"userName\": \"rahul\",\n  \"password\": \"rahul\",\n  \"channel\": \"android\",\n  \"status\": \"ALIVE\"\n}","timestamp":"2016-03-12T08:32:58.334Z"}
+{"level":"info","message":"GET /register - JSON for master collection: {\n  \"_id\": \"1a0a3e30-f6a0-40d1-a5bf-1e434d60caee\",\n  \"firstName\": \"Rahul\",\n  \"lastName\": \"Gandhi\",\n  \"version\": 0,\n  \"status\": \"ALIVE\"\n}","timestamp":"2016-03-12T08:32:58.335Z"}
+{"level":"error","message":"Login Collection - Error in registration for username '1a0a3e30-f6a0-40d1-a5bf-1e434d60caee': MongoError: E11000 duplicate key error index: master_server.login_details.$userName_1 dup key: { : \"rahul\" }","timestamp":"2016-03-12T08:32:58.411Z"}
+{"level":"warn","message":"POST /register - Unsuccessful creation of Login details for UID 1a0a3e30-f6a0-40d1-a5bf-1e434d60caee!","timestamp":"2016-03-12T08:32:58.412Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-15T09:59:55.852Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-03-15T09:59:55.936Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-03-15T09:59:56.086Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-03-15T09:59:56.092Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-03-15T09:59:56.094Z"}
+{"level":"info","message":"POST /login - JSON received: {\n  \"userName\": \"soloreturns\",\n  \"password\": \"5653c6b1f51852a6351ec69c8452abc6\"\n}","timestamp":"2016-03-15T10:00:23.570Z"}
+{"level":"info","message":"Login Collection - Login successful for username 'soloreturns'!","timestamp":"2016-03-15T10:00:24.251Z"}
+{"level":"info","message":"POST /login - JSON received: {\n  \"userName\": \"soloreturns\",\n  \"password\": \"5653c6b1f51852a6351ec69c8452abc6\"\n}","timestamp":"2016-03-15T10:17:31.079Z"}
+{"level":"info","message":"Login Collection - Login successful for username 'soloreturns'!","timestamp":"2016-03-15T10:17:31.081Z"}
+{"level":"info","message":"POST /login - JSON received: {\n  \"userName\": \"soloreturns\",\n  \"password\": \"5653c6b1f51852a6351ec69c8452abc6\"\n}","timestamp":"2016-03-15T10:17:56.166Z"}
+{"level":"info","message":"Login Collection - Login successful for username 'soloreturns'!","timestamp":"2016-03-15T10:17:56.168Z"}
