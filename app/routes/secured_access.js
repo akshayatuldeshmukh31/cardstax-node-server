@@ -155,7 +155,7 @@ secureRouter.get("/logout", function(req, res){
 
 
 //TODO Requires implementation of Amazon AWS functions
-secureRouter.put("/cards", function(req, res){
+secureRouter.post("/cards", function(req, res){
 
   //Preparation to recieve multipart form-data
   var form = new formidable.IncomingForm();

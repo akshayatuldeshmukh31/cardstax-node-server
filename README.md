@@ -272,7 +272,7 @@ Work done till date -
 
 5. URI for logout - /secure/logout 				(HTTP METHOD - GET)
 
-6. URI for saving card details - /secure/cards 	(HTTP METHOD - PUT)
+6. URI for saving card details - /secure/cards 	(HTTP METHOD - POST)
 
 7. URI for saving backup - /secure/backup		(HTTP METHOD - POST)
 
