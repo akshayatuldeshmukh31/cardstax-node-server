@@ -895,3 +895,13 @@
 {"level":"info","message":"Login Collection - Login successful for username 'soloreturns'!","timestamp":"2016-03-15T10:17:31.081Z"}
 {"level":"info","message":"POST /login - JSON received: {\n  \"userName\": \"soloreturns\",\n  \"password\": \"5653c6b1f51852a6351ec69c8452abc6\"\n}","timestamp":"2016-03-15T10:17:56.166Z"}
 {"level":"info","message":"Login Collection - Login successful for username 'soloreturns'!","timestamp":"2016-03-15T10:17:56.168Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-31T13:02:08.282Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-03-31T13:02:08.418Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-03-31T13:02:08.428Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-03-31T13:02:08.430Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-03-31T13:02:08.431Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-03-31T13:05:36.523Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-03-31T13:05:36.592Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-03-31T13:05:36.600Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-03-31T13:05:36.601Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-03-31T13:05:36.602Z"}

@@ -158,13 +158,17 @@ secureRouter.get("/logout", function(req, res){
 secureRouter.post("/cards", function(req, res){
 
   //Preparation to recieve multipart form-data
+  logger.debug("BEGINNING THE FUNCTION");
   var form = new formidable.IncomingForm();
+  logger.debug("Created the form");
   form.uploadDir = __dirname + "/../uploads";
   var jsonSavedCard;
 
   res.setHeader('Content-Type', 'application/json');
+  logger.debug("Parsing form");
   form.parse(req, function(error, fields, files) {
 
+    logger.debug("Parsed form");
     //Field for new card details
     jsonSavedCard = JSON.parse(fields.savedCardDetails);
     logger.info("PUT /cards - JSON received: " + JSON.stringify(jsonSavedCard, null, 2));
