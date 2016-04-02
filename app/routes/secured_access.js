@@ -170,7 +170,9 @@ secureRouter.post("/cards", function(req, res){
 
     logger.debug("Parsed form");
     //Field for new card details
+    logger.debug(fields.savedCardDetails);
     jsonSavedCard = JSON.parse(fields.savedCardDetails);
+    logger.debug("Parsed into saved card");
     logger.info("PUT /cards - JSON received: " + JSON.stringify(jsonSavedCard, null, 2));
 
     var jsonUpdateCard = JSON.parse(JSON.stringify({
