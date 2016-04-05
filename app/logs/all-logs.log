@@ -1349,3 +1349,54 @@
 {"level":"info","message":"GET /cards - Successful retrieval of company logo for main UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:31:25.023Z"}
 {"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-company.jpeg","timestamp":"2016-04-05T07:31:25.113Z"}
 {"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-profile.jpeg","timestamp":"2016-04-05T07:31:25.160Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-04-05T07:34:30.063Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-04-05T07:34:30.176Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-04-05T07:34:30.184Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-04-05T07:34:30.186Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-04-05T07:34:30.187Z"}
+{"level":"info","message":"Cloud - Successfully retrieved backup for UID 056462c2-7295-426d-9e35-69686d01d683","timestamp":"2016-04-05T07:34:34.965Z"}
+{"level":"info","message":"Master Collection - Card details retrieved successfully for UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:34:34.972Z"}
+{"level":"warn","message":"Master Collection - No such data pertaining to UID 056462c2-7295-426d-9e35-62686d01d683","timestamp":"2016-04-05T07:34:34.980Z"}
+{"level":"warn","message":"GET /cards - Unsuccessful retrieval of card details for UID 056462c2-7295-426d-9e35-62686d01d683 belonging to the card stack of UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:34:34.981Z"}
+{"level":"warn","message":"Master Collection - No such data pertaining to UID 056462c2-7295-426d-9e35-62686d01dasd","timestamp":"2016-04-05T07:34:34.982Z"}
+{"level":"warn","message":"GET /cards - Unsuccessful retrieval of card details for UID 056462c2-7295-426d-9e35-62686d01dasd belonging to the card stack of UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:34:34.983Z"}
+{"level":"info","message":"Cloud - C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-profile.jpeg written successfully!","timestamp":"2016-04-05T07:34:42.505Z"}
+{"level":"info","message":"GET /cards - Successful retrieval of profile picture for main UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:34:42.507Z"}
+{"level":"info","message":"Cloud - C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-company.jpeg written successfully!","timestamp":"2016-04-05T07:34:44.778Z"}
+{"level":"info","message":"GET /cards - Successful retrieval of company logo for main UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:34:44.780Z"}
+{"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-company.jpeg","timestamp":"2016-04-05T07:34:44.843Z"}
+{"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-profile.jpeg","timestamp":"2016-04-05T07:34:44.869Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-04-05T07:35:37.777Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-04-05T07:35:37.822Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-04-05T07:35:37.829Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-04-05T07:35:37.830Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-04-05T07:35:37.831Z"}
+{"level":"info","message":"Cloud - Successfully retrieved backup for UID 056462c2-7295-426d-9e35-69686d01d683","timestamp":"2016-04-05T07:35:43.216Z"}
+{"level":"info","message":"Master Collection - Card details retrieved successfully for UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:35:43.220Z"}
+{"level":"warn","message":"Master Collection - No such data pertaining to UID 056462c2-7295-426d-9e35-62686d01d683","timestamp":"2016-04-05T07:35:43.230Z"}
+{"level":"warn","message":"GET /cards - Unsuccessful retrieval of card details for UID 056462c2-7295-426d-9e35-62686d01d683 belonging to the card stack of UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:35:43.231Z"}
+{"level":"warn","message":"Master Collection - No such data pertaining to UID 056462c2-7295-426d-9e35-62686d01dasd","timestamp":"2016-04-05T07:35:43.231Z"}
+{"level":"warn","message":"GET /cards - Unsuccessful retrieval of card details for UID 056462c2-7295-426d-9e35-62686d01dasd belonging to the card stack of UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:35:43.231Z"}
+{"level":"info","message":"Cloud - C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-profile.jpeg written successfully!","timestamp":"2016-04-05T07:35:52.035Z"}
+{"level":"info","message":"GET /cards - Successful retrieval of profile picture for main UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:35:52.036Z"}
+{"level":"info","message":"Cloud - C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-company.jpeg written successfully!","timestamp":"2016-04-05T07:35:57.833Z"}
+{"level":"info","message":"GET /cards - Successful retrieval of company logo for main UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:35:57.834Z"}
+{"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-company.jpeg","timestamp":"2016-04-05T07:35:57.910Z"}
+{"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-profile.jpeg","timestamp":"2016-04-05T07:35:57.919Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-04-05T07:37:43.312Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-04-05T07:37:43.414Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-04-05T07:37:43.460Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-04-05T07:37:43.461Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for userName!","timestamp":"2016-04-05T07:37:43.462Z"}
+{"level":"info","message":"Cloud - Successfully retrieved backup for UID 056462c2-7295-426d-9e35-69686d01d683","timestamp":"2016-04-05T07:37:50.857Z"}
+{"level":"info","message":"Master Collection - Card details retrieved successfully for UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:37:50.869Z"}
+{"level":"warn","message":"Master Collection - No such data pertaining to UID 056462c2-7295-426d-9e35-62686d01d683","timestamp":"2016-04-05T07:37:50.886Z"}
+{"level":"warn","message":"GET /cards - Unsuccessful retrieval of card details for UID 056462c2-7295-426d-9e35-62686d01d683 belonging to the card stack of UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:37:50.887Z"}
+{"level":"warn","message":"Master Collection - No such data pertaining to UID 056462c2-7295-426d-9e35-62686d01dasd","timestamp":"2016-04-05T07:37:50.889Z"}
+{"level":"warn","message":"GET /cards - Unsuccessful retrieval of card details for UID 056462c2-7295-426d-9e35-62686d01dasd belonging to the card stack of UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:37:50.890Z"}
+{"level":"info","message":"Cloud - C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-profile.jpeg written successfully!","timestamp":"2016-04-05T07:38:01.825Z"}
+{"level":"info","message":"GET /cards - Successful retrieval of profile picture for main UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:38:01.826Z"}
+{"level":"info","message":"Cloud - C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-company.jpeg written successfully!","timestamp":"2016-04-05T07:38:23.178Z"}
+{"level":"info","message":"GET /cards - Successful retrieval of company logo for main UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:38:23.181Z"}
+{"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-company.jpeg","timestamp":"2016-04-05T07:38:23.271Z"}
+{"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-profile.jpeg","timestamp":"2016-04-05T07:38:23.291Z"}
