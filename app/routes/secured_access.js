@@ -29,8 +29,8 @@ var logger = require("./../../config/logger");
 //Router middleware for checking validity of token (CHECKPOINT)
 secureRouter.use(function(req, res, next){
 
-    console.log(req.headers);
-    console.log(req.body);
+    //console.log(req.headers);
+    //console.log(req.body);
     //Check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
@@ -69,6 +69,15 @@ secureRouter.use(function(req, res, next){
   	}
 });
 
+secureRouter.get("/test", function(req,res){
+
+  var contact = JSON.parse(JSON.stringify({
+    "x": "axis",
+    "y": "axis"
+  }));
+  contact['z'] = 'axis';
+  logger.debug(JSON.stringify(contact, null, 2));
+});
 
 //To update the password of the user account
 secureRouter.put("/update", function(req, res){
@@ -298,6 +307,8 @@ secureRouter.post("/backup", function(req, res){
 //TODO Endpoint for retrieving backups
 secureRouter.get("/cards", function(req, res){
 
+  res.setHeader('Content-Type', 'application/json');
+
   //Variables
   var appendJsonSnippet, mDone1, mDone2, done1, done2, contactRetOver = 0;
   var form = new formData();
@@ -306,7 +317,6 @@ secureRouter.get("/cards", function(req, res){
   amazonS3Methods.returnBackupToExpressServer(req.decoded._id, backupFile, function(result, message, data){
     if(message){
       logger.warn("GET /cards - Failed to retrieve backup for UID " + req.decoded._id);
-      res.setHeader('Content-Type', 'application/json');
       res.send(JSON.stringify({
         "success": result,
         "error" : message
@@ -323,7 +333,6 @@ secureRouter.get("/cards", function(req, res){
       cardMethods.searchCardDetails(jsonFindCriteriaForUser, function(result, item, message){
         if(message){
           logger.warn("GET /cards - Failed to retrieve user card details for UID " + backupData._id + ": " + message);
-          res.setHeader('Content-Type', 'application/json');
           res.send(JSON.stringify({
             "success": result,
             "error" : message
@@ -358,68 +367,91 @@ secureRouter.get("/cards", function(req, res){
           mDone2 = 0;
           
           //Download pics of the main user
-          amazonS3Methods.returnProfilePictureToExpressServer(backupData._id, function(result, message, file){
-            mDone1 = 1;
+          amazonS3Methods.returnProfilePictureToExpressServer(backupData._id, function(result, message, file, contentType){
             if(message){
               logger.warn("GET /cards - Unsuccessful retrieval of profile picture for main UID " + backupData._id + "!");
+              mDone1 = 1;
+              if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+                res.send(JSON.stringify(cardStack));
+                for(var i = 0; i<deletePics.cards.length; i++)
+                  deletePictures(deletePics, i);
+              }
             }
             else{
               logger.info("GET /cards - Successful retrieval of profile picture for main UID " + backupData._id + "!")
-              //Attach image to form
-              form.append(backupData._id + "-profile", fs.createReadStream(file));
+              
               deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
-            }
-
-            if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-              form.append("cardStack", JSON.stringify(cardStack));
-              res.set(form.getHeaders());
-              var stream = form.pipe(res);
-
-              stream.on("finish", function(){
-                for(var i = 0; i<deletePics.cards.length; i++)
-                  deletePictures(deletePics, i);
+              var readStream1 = fs.createReadStream(file);
+              var content1;
+              readStream1.on('data', function(chunk){
+                content1 += chunk;
+              })
+              .on('end', function(chunk){
+                cardStack[backupData._id + "-profile"] = content1;
+                cardStack[backupData._id + "-profile-contentType"] = contentType;
+                mDone1 = 1;
+                if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+                  res.send(JSON.stringify(cardStack));
+                  for(var i = 0; i<deletePics.cards.length; i++)
+                    deletePictures(deletePics, i);
+                }
               });
+
+              //Attach image to form
+              //form.append(backupData._id + "-profile", fs.createReadStream(file));
+              //logger.debug(fs.createReadStream(file));
             }
+
+            
           });
 
-          amazonS3Methods.returnCompanyLogoToExpressServer(backupData._id, function(result, message, file){
-            mDone2 = 1;
+          amazonS3Methods.returnCompanyLogoToExpressServer(backupData._id, function(result, message, file, contentType){
             if(message){
               logger.warn("GET /cards - Unsuccessful retrieval of company logo for main UID " + backupData._id + "!");
+              mDone2 = 1;
+              if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+                res.send(JSON.stringify(cardStack));
+                for(var i = 0; i<deletePics.cards.length; i++)
+                  deletePictures(deletePics, i);
+              }
             }
             else{
               logger.info("GET /cards - Successful retrieval of company logo for main UID " + backupData._id + "!");
-              //Attach image to form
-              form.append(backupData._id + "-company", fs.createReadStream(file));
+              
               deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
-            }
-
-            if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-              form.append("cardStack", JSON.stringify(cardStack));
-              res.set(form.getHeaders());
-              var stream = form.pipe(res);
-
-              stream.on("finish", function(){
-                for(var i = 0; i<deletePics.cards.length; i++)
-                  deletePictures(deletePics, i);
+              var readStream2 = fs.createReadStream(file);
+              var content2;
+              readStream2.on('data', function(chunk){
+                content2 += chunk;
+              })
+              .on('end', function(chunk){
+                cardStack[backupData._id + "-company"] = content2;
+                cardStack[backupData._id + "-company-contentType"] = contentType;
+                mDone2 = 1;
+                if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+                  res.send(JSON.stringify(cardStack));
+                  for(var i = 0; i<deletePics.cards.length; i++)
+                    deletePictures(deletePics, i);
+                }
               });
+
+              //Attach image to form
+              //form.append(backupData._id + "-company", fs.createReadStream(file));
             }
           });
 
+          var i = 0, j;
           //Retrieve card details of the user's contacts
-          for(var i = 0; i<backupData.cards.length; i++){
+          for(i = 0; i<backupData.cards.length; i++){
+            j = i;
+            
             getContactDetails(cardStack, backupData, i, form, deletePics, function(){
-              if(mDone1 == 1 && mDone2 == 1 && i >= backupData.cards.length){
-                form.append("cardStack", JSON.stringify(cardStack));
-                res.set(form.getHeaders());
-                var stream = form.pipe(res);
-
-                stream.on("finish", function(){
-                  for(var i = 0; i<deletePics.cards.length; i++)
-                    deletePictures(deletePics, i);
-                });
+              if(mDone1 == 1 && mDone2 == 1 && (j == backupData.cards.length - 1)){
+                res.send(JSON.stringify(cardStack));
+                for(var i = 0; i<deletePics.cards.length; i++)
+                  deletePictures(deletePics, i);
               }
-              else if(i >= backupData.cards.length){
+              else if(j == backupData.cards.length - 1){
                 contactRetOver = 1;
               }
             });
@@ -448,9 +480,9 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
     else{
 
       contact.circle = backupData.cards[i].circle;
-      cardStack.cards.push(contact);
+      //cardStack.cards.push(contact);
 
-      amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file){
+      amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
         if(message){
           done1 = -1;
           logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
@@ -458,17 +490,30 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
         else{
           done1 = 1
           logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
-                    
+          
+          var readStream3 = fs.createReadStream(file);
+          var content3;
+          readStream3.on('data', function(chunk){
+            content3 += chunk;
+          })
+          .on('end', function(chunk){
+            contact[jsonFindCriteria._id + "-profile"] = content3;
+            contact[jsonFindCriteria._id + "-profile-contentType"] = contentType;
+          });
+
           //Attach image to form
-          form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
+          //form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
+
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
-          if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1))
+          if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1)){
+            cardStack.cards.push(contact);            
             callback();
+          }
         }
       });
 
-      amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file){
+      amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
         if(message){
           done2 = -1;
           logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
@@ -477,12 +522,24 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           done2 = 1
           logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
                     
+          var readStream4 = fs.createReadStream(file);
+          var content4;
+          readStream4.on('data', function(chunk){
+            content4 += chunk;
+          })
+          .on('end', function(chunk){
+            contact[jsonFindCriteria._id + "-company"] = content4;
+            contact[jsonFindCriteria._id + "-company-contentType"] = contentType;
+          });
+          
           //Attach image to form
-          form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
+          //form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
-          if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1))
+          if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1)){
+            cardStack.cards.push(contact);
             callback();
+          }
         }
       });
     }

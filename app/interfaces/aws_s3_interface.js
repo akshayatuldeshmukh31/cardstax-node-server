@@ -60,7 +60,7 @@ function returnProfilePictureToExpressServer(id, callback){
   s3.getObject(params, function(err, data){
     if(err){
       logger.error("Cloud - Encountered error in retrieving profile picture for UID " + id + ": " + err);
-      callback(statusCodes.operationError, err, null);
+      callback(statusCodes.operationError, err, null, null);
     }
     else if(data){
       var profilePicExt = data.ContentType.split('/').pop();
@@ -69,11 +69,11 @@ function returnProfilePictureToExpressServer(id, callback){
       fs.writeFile(file, data.Body, function (err){
         if(err){
           logger.error("Cloud - Error in writing profile picture " + file + ": " + err);
-          callback(statusCodes.operationError, err, file);
+          callback(statusCodes.operationError, err, file, null);
         }
         else{
           logger.info("Cloud - " + file + " written successfully!");
-          callback(statusCodes.operationSuccess, err, file);
+          callback(statusCodes.operationSuccess, err, file, data.ContentType);
         }
       });
     }
@@ -116,7 +116,7 @@ function returnCompanyLogoToExpressServer(id, callback){
   s3.getObject(params, function(err, data){
     if(err){
       logger.error("Cloud - Encountered error in retrieving company logo for UID " + id + ": " + err);
-      callback(statusCodes.operationError, err, null);
+      callback(statusCodes.operationError, err, null, null);
     }
     else if(data){
       var companyLogoExt = data.ContentType.split('/').pop();
@@ -125,11 +125,11 @@ function returnCompanyLogoToExpressServer(id, callback){
       fs.writeFile(file, data.Body, function (err){
         if(err){
           logger.error("Cloud - Error in writing company logo " + file + ": " + err);
-          callback(statusCodes.operationError, err, file);
+          callback(statusCodes.operationError, err, file, null);
         }
         else{
           logger.info("Cloud - " + file + " written successfully!");
-          callback(statusCodes.operationSuccess, err, file);
+          callback(statusCodes.operationSuccess, err, file, data.ContentType);
         }
       });
     }
