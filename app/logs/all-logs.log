@@ -1400,3 +1400,7 @@
 {"level":"info","message":"GET /cards - Successful retrieval of company logo for main UID 056462c2-7295-426d-9e35-69686d01d683!","timestamp":"2016-04-05T07:38:23.181Z"}
 {"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-company.jpeg","timestamp":"2016-04-05T07:38:23.271Z"}
 {"level":"info","message":"Server - Successfully deleted C:\\Users\\Akshay\\Desktop\\CPRQ\\MAJOR PROJECT\\cardstax-node-server\\app\\interfaces/../downloads/056462c2-7295-426d-9e35-69686d01d683-profile.jpeg","timestamp":"2016-04-05T07:38:23.291Z"}
+{"level":"info","message":"Express Server - Server is operational: :: 8800","timestamp":"2016-04-07T13:27:22.311Z"}
+{"level":"info","message":"MongoDb Server - Successfully connected to database!","timestamp":"2016-04-07T13:27:22.438Z"}
+{"level":"info","message":"Login Collection - Index creation is successful for id!","timestamp":"2016-04-07T13:27:22.520Z"}
+{"level":"info","message":"Master Collection - Index creation is successful for id!","timestamp":"2016-04-07T13:27:22.585Z"}

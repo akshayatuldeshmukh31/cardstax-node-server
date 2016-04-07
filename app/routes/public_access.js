@@ -63,7 +63,7 @@ publicRouter.post("/register", function(req,res){
 	
 	res.setHeader('Content-Type', 'application/json');
 
-	userAccountMethods.searchLoginDetails(jsonObjToSearchUsername, function(result, message){
+	userAccountMethods.searchLoginDetails(jsonObjToSearchUsername, function(result, item, message){
 		if(message){
 			//Call to insert details into login collection of the server
 			userAccountMethods.createLoginDetails(jsonObjForLoginColl, function(result, message){
