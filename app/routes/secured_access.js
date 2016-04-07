@@ -29,8 +29,8 @@ var logger = require("./../../config/logger");
 //Router middleware for checking validity of token (CHECKPOINT)
 secureRouter.use(function(req, res, next){
 
-    //console.log(req.headers);
-    //console.log(req.body);
+    console.log(req.headers);
+    console.log(req.body);
     //Check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
