@@ -57,12 +57,14 @@ function startMongoServer(){
 				else if(results){
 					logger.info("Login Collection - Index creation is successful for id!");
 
+					/*
 					loginCollection.ensureIndex({"userName":1, unique:true}, function(err,results){
 						if(err)
 							logger.error("Login Collection - Error in ensuring index for userName: "+err);
 						else if(results)
 							logger.info("Login Collection - Index creation is successful for userName!");
 					});
+					*/
 				}
 			});
 

@@ -26,4 +26,6 @@ exports.operationSuccess = "1";							//Operation was executed smoothly
 exports.recordStatusAlive = "ALIVE";					//Used when accounts are created and are being used
 exports.recordStatusDead = "DEAD";						//Used when accounts are deleted
 
+exports.existingUsernameMessage = "Username already exists"
+
 
