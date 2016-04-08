@@ -19,6 +19,7 @@ var publicRouter = express.Router();
 
 var userAccountMethods = require("./../interfaces/mongodb_accounts_interface");
 var cardMethods = require("./../interfaces/mongodb_cards_interface");
+var as3Methods = require("./../interfaces/aws_s3_interface");
 var config = require("./../../config/config");
 var statusCodes = require("./../status_codes");
 var logger = require("./../../config/logger");
@@ -63,50 +64,69 @@ publicRouter.post("/register", function(req,res){
 	
 	res.setHeader('Content-Type', 'application/json');
 
-	userAccountMethods.searchLoginDetails(jsonObjToSearchUsername, function(result, item, message){
-		if(message){
-			//Call to insert details into login collection of the server
-			userAccountMethods.createLoginDetails(jsonObjForLoginColl, function(result, message){
-				if(message==null){
-					logger.info("POST /register - Login details created successfully for UID " + jsonObjForLoginColl._id + "!");
 
-					//Call to insert details into master collection of the server
-					cardMethods.createCardDetails(jsonObjForMasterColl, function(result, message){
+	var initialBackup = JSON.stringify({
+		"_id": userId,
+		"cards": []
+	});
+
+	as3Methods.uploadBackup(userId + "-backup.json", initialBackup, "application/json", function(result, message){
+		if(message){
+			logger.warn("POST /register - Failed to create backup for UID " + userId + ". Failed registration!");
+			res.send(JSON.stringify({
+				"success":result,
+				"error": message
+			}));
+		}
+		else{
+			userAccountMethods.searchLoginDetails(jsonObjToSearchUsername, function(result, item, message){
+				if(message){
+					//Call to insert details into login collection of the server
+					userAccountMethods.createLoginDetails(jsonObjForLoginColl, function(result, message){
+						if(message==null){
+							logger.info("POST /register - Login details created successfully for UID " + jsonObjForLoginColl._id + "!");
+
+							//Call to insert details into master collection of the server
+							cardMethods.createCardDetails(jsonObjForMasterColl, function(result, message){
 				
-						//Sending a response to the request
-						if(message){	
-							logger.warn("POST /register - Unsuccessful creation of Master details for UID " + jsonObjForMasterColl._id + "!");	
+								//Sending a response to the request
+								if(message){	
+									logger.warn("POST /register - Unsuccessful creation of Master details for UID " + jsonObjForMasterColl._id + "!");	
+									res.send(JSON.stringify({
+										"success":result,
+										"error": message
+									}));
+								}
+								else{
+									logger.info("POST /register - Master details created successfully for UID " + jsonObjForMasterColl._id + "!");
+
+									res.send(JSON.stringify({
+										"success":result,
+										"error": message,
+										"_id":userId
+									}));
+								}		
+							});	
+						}
+						else{
+							logger.warn("POST /register - Unsuccessful creation of Login details for UID " + jsonObjForLoginColl._id + "!");
 							res.send(JSON.stringify({
 								"success":result,
 								"error": message
 							}));
 						}
-						else{
-							logger.info("POST /register - Master details created successfully for UID " + jsonObjForMasterColl._id + "!");
-							res.send(JSON.stringify({
-								"success":result,
-								"error": message,
-								"_id":userId
-							}));
-						}		
-					});	
+					});
 				}
 				else{
-					logger.warn("POST /register - Unsuccessful creation of Login details for UID " + jsonObjForLoginColl._id + "!");
 					res.send(JSON.stringify({
-						"success":result,
-						"error": message
+						"success": result,
+						"error": statusCodes.existingUsernameMessage
 					}));
 				}
 			});
 		}
-		else{
-			res.send(JSON.stringify({
-				"success": result,
-				"error": statusCodes.existingUsernameMessage
-			}));
-		}
 	});
+	
 });
 
 
