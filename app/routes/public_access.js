@@ -173,4 +173,113 @@ publicRouter.post("/login", function(req,res){
 	});
 });
 
+publicRouter.post("/fbLogin", function(req, res){
+
+	logger.info("POST /fbLogin - JSON received: " + JSON.stringify(req.body, null, 2));
+
+	var options = {
+		host: 'https://graph.facebook.com',
+		path: '/me?fields=id&access_token='+req.body.fbToken
+	};
+	http.get(options, function(response) {
+        // Continuously update stream with data
+        var body = '';
+        response.on('data', function(d) {
+            body += d;
+        });
+        response.on('end', function() {
+
+            // Data reception is done, do whatever with it!
+            var parsed = JSON.parse(body);
+            callback({
+                email: parsed.email,
+                password: parsed.pass
+            });
+
+            fbLogin(parsed.id, res);
+        });
+    });
+});
+
+function fbLogin(id, res){
+	//For the login collection of the server
+	var jsonObjToSearchUsername = JSON.parse(JSON.stringify({
+		"userName": id,
+		"status": statusCodes.recordStatusAlive
+	}));
+
+	userAccountMethods.searchLoginDetails(jsonObjToSearchUsername, function(result, item, message){
+		if(message){
+
+			userId = uuid.v4();
+			var jsonObjForLoginColl = JSON.parse(JSON.stringify({
+				"_id": userId,
+				"userName": id,
+				"password": "FACEBOOK USER",
+				"channel": "FACEBOOK",
+				"status": statusCodes.recordStatusAlive
+			}));
+
+			var jsonObjForMasterColl = JSON.parse(JSON.stringify({
+				"_id": userId,
+				"version": 0,
+				"status": statusCodes.recordStatusAlive
+			}));
+
+			userAccountMethods.createLoginDetails(jsonObjForLoginColl, function(result, message){
+				if(message==null){
+					logger.info("POST /fbLogin - Login details created successfully for UID " + userId + "!");
+
+					//Call to insert details into master collection of the server
+					cardMethods.createCardDetails(jsonObjForMasterColl, function(result, message){
+				
+						//Sending a response to the request
+						if(message){	
+							logger.warn("POST /fbLogin - Unsuccessful creation of Master details for UID " + userId + "!");	
+							res.send(JSON.stringify({
+								"success":result,
+								"error": message
+							}));
+						}
+						else{
+							logger.info("POST /fbLogin - Master details created successfully for UID " + userId + "!");
+
+							var token = jwt.sign(item, config.secret, {
+								expiresIn: 86400 //Expires in 24 hours
+							});
+
+							res.send(JSON.stringify({
+								"success":result,
+								"error": message,
+								"token": token,
+								"_id":userId
+							}));
+						}		
+					});	
+				}
+				else{
+					logger.warn("POST /fbLogin - Unsuccessful creation of Login details for UID " + userId + "!");
+					res.send(JSON.stringify({
+						"success":result,
+						"error": message
+					}));
+				}
+			});
+		}
+		else{
+
+			var token = jwt.sign(item, config.secret, {
+				expiresIn: 86400 //Expires in 24 hours
+			});
+
+			res.send(JSON.stringify({
+				"success":result,
+				"error": message,
+				"token": token,
+				"_id": item._id
+			}));
+		}
+	});
+}
+
 module.exports = publicRouter;
