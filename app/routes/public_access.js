@@ -15,6 +15,7 @@ var util = require("util");
 var bodyParser = require("body-parser");
 var fs = require("fs");
 var path = require("path");
+var http = require("http");
 var publicRouter = express.Router();
 
 var userAccountMethods = require("./../interfaces/mongodb_accounts_interface");
