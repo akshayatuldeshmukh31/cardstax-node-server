@@ -15,7 +15,7 @@ var util = require("util");
 var bodyParser = require("body-parser");
 var fs = require("fs");
 var path = require("path");
-var http = require("http");
+var https = require("https");
 var publicRouter = express.Router();
 
 var userAccountMethods = require("./../interfaces/mongodb_accounts_interface");
@@ -179,10 +179,10 @@ publicRouter.post("/fbLogin", function(req, res){
 	logger.info("POST /fbLogin - JSON received: " + JSON.stringify(req.body, null, 2));
 
 	var options = {
-		host: 'https://graph.facebook.com',
+		host: 'graph.facebook.com',
 		path: '/me?fields=id&access_token='+req.body.fbToken
 	};
-	http.get(options, function(response) {
+	https.get(options, function(response) {
         // Continuously update stream with data
         var body = '';
         response.on('data', function(d) {
@@ -190,12 +190,10 @@ publicRouter.post("/fbLogin", function(req, res){
         });
         response.on('end', function() {
 
+        	logger.debug(body);
             // Data reception is done, do whatever with it!
             var parsed = JSON.parse(body);
-            callback({
-                email: parsed.email,
-                password: parsed.pass
-            });
+            logger.debug(parsed);
 
             fbLogin(parsed.id, res);
         });
