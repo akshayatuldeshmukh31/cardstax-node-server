@@ -203,7 +203,7 @@ publicRouter.post("/fbLogin", function(req, res){
 function fbLogin(parsedFbBody, res){
 	//For the login collection of the server
 	var jsonObjToSearchUsername = JSON.parse(JSON.stringify({
-		"userName": id,
+		"userName": parsedFbBody.id,
 		"status": statusCodes.recordStatusAlive
 	}));
 
