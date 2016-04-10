@@ -492,6 +492,12 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
         if(message){
           done1 = -1;
           logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+
+          if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
+            cardStack.cards.push(contact);            
+            callback();
+          }
         }
         else{
           logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
@@ -529,6 +535,12 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
         if(message){
           done2 = -1;
           logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+
+          if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
+            cardStack.cards.push(contact);            
+            callback();
+          }
         }
         else{
           
