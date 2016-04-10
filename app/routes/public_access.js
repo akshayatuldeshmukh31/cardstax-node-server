@@ -101,7 +101,7 @@ publicRouter.post("/register", function(req,res){
 								else{
 									logger.info("POST /register - Master details created successfully for UID " + jsonObjForMasterColl._id + "!");
 
-									var token = jwt.sign(item, config.secret, {
+									var token = jwt.sign(jsonObjForLoginColl, config.secret, {
 										expiresIn: 86400 //Expires in 24 hours
 									});
 
