@@ -446,7 +446,7 @@ secureRouter.get("/cards", function(req, res){
           });
 
           var i = 0, j;
-          int counter = 0;
+          var counter = 0;
           //Retrieve card details of the user's contacts
           for(i = 0; i<backupData.cards.length; i++){
             j = i;
