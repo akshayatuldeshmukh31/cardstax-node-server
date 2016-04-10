@@ -326,7 +326,6 @@ secureRouter.get("/cards", function(req, res){
     }
     else{
       var backupData = JSON.parse(data);
-      logger.debug(backupData);
       
       var jsonFindCriteriaForUser = JSON.parse(JSON.stringify({
         "_id": backupData._id,
@@ -394,7 +393,6 @@ secureRouter.get("/cards", function(req, res){
                 cardStack[backupData._id + "-profile-contentType"] = contentType;
                 mDone1 = 1;
                 if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-                  logger.debug("SENDING " + cardStack);
                   res.send(JSON.stringify(cardStack));
                   for(var i = 0; i<deletePics.cards.length; i++)
                     deletePictures(deletePics, i);
@@ -433,7 +431,6 @@ secureRouter.get("/cards", function(req, res){
                 cardStack[backupData._id + "-company-contentType"] = contentType;
                 mDone2 = 1;
                 if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-                  logger.debug("SENDING " + cardStack);
                   res.send(JSON.stringify(cardStack));
                   for(var i = 0; i<deletePics.cards.length; i++)
                     deletePictures(deletePics, i);
@@ -446,20 +443,17 @@ secureRouter.get("/cards", function(req, res){
           });
 
           var i = 0, j;
-          var counter = 0;
           //Retrieve card details of the user's contacts
           for(i = 0; i<backupData.cards.length; i++){
             j = i;
             
             getContactDetails(cardStack, backupData, i, form, deletePics, function(){
-              counter = counter + 1;
-              if(mDone1 == 1 && mDone2 == 1 && (counter == backupData.cards.length - 1)){
-                logger.debug("SENDING " + cardStack);
+              if(mDone1 == 1 && mDone2 == 1 && (j == backupData.cards.length - 1)){
                 res.send(JSON.stringify(cardStack));
                 for(var i = 0; i<deletePics.cards.length; i++)
                   deletePictures(deletePics, i);
               }
-              else if(counter == backupData.cards.length - 1){
+              else if(j == backupData.cards.length - 1){
                 contactRetOver = 1;
               }
             });
@@ -494,11 +488,6 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
         if(message){
           done1 = -1;
           logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
-         
-          if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
-            cardStack.cards.push(contact);            
-            callback();
-          }
         }
         else{
           logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
@@ -509,26 +498,20 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
             content3 += chunk;
           })
           .on('end', function(chunk){
+            done1 = 1;
             contact[jsonFindCriteria._id + "-profile"] = new Buffer(content3).toString('base64');
             contact[jsonFindCriteria._id + "-profile-contentType"] = contentType;
-            deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
-            done1 = 1;
-
-            if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
-              cardStack.cards.push(contact);            
-              callback();
-            }
           });
 
           //Attach image to form
           //form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
 
-          /*deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
           if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
             cardStack.cards.push(contact);            
             callback();
-          }*/
+          }
         }
       });
 
@@ -536,14 +519,9 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
         if(message){
           done2 = -1;
           logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
-          
-          if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
-            cardStack.cards.push(contact);            
-            callback();
-          }
         }
         else{
-          
+          done2 = 1
           logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
                     
           var readStream4 = fs.createReadStream(file);
@@ -554,23 +532,16 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           .on('end', function(chunk){
             contact[jsonFindCriteria._id + "-company"] = new Buffer(content4).toString('base64');
             contact[jsonFindCriteria._id + "-company-contentType"] = contentType;
-            deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
-            done2 = 1;
-
-            if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
-              cardStack.cards.push(contact);
-              callback();
-            }
           });
           
           //Attach image to form
           //form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
-          /*deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
           if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
             cardStack.cards.push(contact);
             callback();
-          }*/
+          }
         }
       });
     }
