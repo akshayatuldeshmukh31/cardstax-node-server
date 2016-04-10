@@ -446,18 +446,20 @@ secureRouter.get("/cards", function(req, res){
           });
 
           var i = 0, j;
+          int counter = 0;
           //Retrieve card details of the user's contacts
           for(i = 0; i<backupData.cards.length; i++){
             j = i;
             
             getContactDetails(cardStack, backupData, i, form, deletePics, function(){
-              if(mDone1 == 1 && mDone2 == 1 && (j == backupData.cards.length - 1)){
+              counter++;
+              if(mDone1 == 1 && mDone2 == 1 && (counter == backupData.cards.length - 1)){
                 logger.debug("SENDING " + cardStack);
                 res.send(JSON.stringify(cardStack));
                 for(var i = 0; i<deletePics.cards.length; i++)
                   deletePictures(deletePics, i);
               }
-              else if(j == backupData.cards.length - 1){
+              else if(counter == backupData.cards.length - 1){
                 contactRetOver = 1;
               }
             });
