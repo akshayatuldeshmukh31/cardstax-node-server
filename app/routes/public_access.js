@@ -180,7 +180,7 @@ publicRouter.post("/fbLogin", function(req, res){
 
 	var options = {
 		host: 'graph.facebook.com',
-		path: '/me?fields=id&access_token='+req.body.fbToken
+		path: '/me?fields=id,first_name,last_name&access_token='+req.body.fbToken
 	};
 	https.get(options, function(response) {
         // Continuously update stream with data
@@ -195,12 +195,12 @@ publicRouter.post("/fbLogin", function(req, res){
             var parsed = JSON.parse(body);
             logger.debug(parsed);
 
-            fbLogin(parsed.id, res);
+            fbLogin(parsed, res);
         });
     });
 });
 
-function fbLogin(id, res){
+function fbLogin(parsedFbBody, res){
 	//For the login collection of the server
 	var jsonObjToSearchUsername = JSON.parse(JSON.stringify({
 		"userName": id,
@@ -213,7 +213,7 @@ function fbLogin(id, res){
 			userId = uuid.v4();
 			var jsonObjForLoginColl = JSON.parse(JSON.stringify({
 				"_id": userId,
-				"userName": id,
+				"userName": parsedFbBody.id,
 				"password": "FACEBOOK USER",
 				"channel": "FACEBOOK",
 				"status": statusCodes.recordStatusAlive
@@ -221,6 +221,8 @@ function fbLogin(id, res){
 
 			var jsonObjForMasterColl = JSON.parse(JSON.stringify({
 				"_id": userId,
+				"firstName": parsedFbBody.first_name,
+				"lastName": parsedFbBody.last_name,
 				"version": 0,
 				"status": statusCodes.recordStatusAlive
 			}));
@@ -267,7 +269,7 @@ function fbLogin(id, res){
 		}
 		else{
 
-			var token = jwt.sign(jsonObjForLoginColl, config.secret, {
+			var token = jwt.sign(item, config.secret, {
 				expiresIn: 86400 //Expires in 24 hours
 			});
 
