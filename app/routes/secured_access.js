@@ -390,15 +390,18 @@ secureRouter.get("/cards", function(req, res){
                 content1 += chunk;
               })
               .on('end', function(chunk){
-                cardStack[backupData._id + "-profile"] = new Buffer(content1).toString('base64');
-                cardStack[backupData._id + "-profile-contentType"] = contentType;
-                mDone1 = 1;
-                if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-                  logger.debug("SENDING " + cardStack);
-                  res.send(JSON.stringify(cardStack));
-                  for(var i = 0; i<deletePics.cards.length; i++)
-                    deletePictures(deletePics, i);
-                }
+                attachImage(cardStack, backupData._id + "-profile", content1, backupData._id + "-profile-contentType", contentType, function(){
+                  mDone1 = 1;
+                  if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+                    logger.debug("SENDING " + cardStack);
+                    res.send(JSON.stringify(cardStack));
+                    for(var i = 0; i<deletePics.cards.length; i++)
+                      deletePictures(deletePics, i);
+                  }
+                });
+                //cardStack[backupData._id + "-profile"] = new Buffer(content1).toString('base64');
+                //cardStack[backupData._id + "-profile-contentType"] = contentType;
+                
               });
 
               //Attach image to form
@@ -429,15 +432,18 @@ secureRouter.get("/cards", function(req, res){
                 content2 += chunk;
               })
               .on('end', function(chunk){
-                cardStack[backupData._id + "-company"] = new Buffer(content2).toString('base64');
-                cardStack[backupData._id + "-company-contentType"] = contentType;
-                mDone2 = 1;
-                if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
-                  logger.debug("SENDING " + cardStack);
-                  res.send(JSON.stringify(cardStack));
-                  for(var i = 0; i<deletePics.cards.length; i++)
-                    deletePictures(deletePics, i);
-                }
+                attachImage(cardStack, backupData._id + "-company", content2, backupData._id + "-company-contentType", contentType, function(){
+                  mDone2 = 1;
+                  if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+                    logger.debug("SENDING " + cardStack);
+                    res.send(JSON.stringify(cardStack));
+                    for(var i = 0; i<deletePics.cards.length; i++)
+                      deletePictures(deletePics, i);
+                  }  
+                });
+                //cardStack[backupData._id + "-company"] = new Buffer(content2).toString('base64');
+                //cardStack[backupData._id + "-company-contentType"] = contentType;
+                
               });
 
               //Attach image to form
@@ -509,7 +515,16 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
             content3 += chunk;
           })
           .on('end', function(chunk){
-            contact[jsonFindCriteria._id + "-profile"] = new Buffer(content3).toString('base64');
+            attachImage(contact, jsonFindCriteria._id + "-profile", content3, jsonFindCriteria._id + "-profile-contentType", contentType, function(){
+              deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+              done1 = 1;
+
+              if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
+                cardStack.cards.push(contact);            
+                callback();
+              }  
+            });
+            /*contact[jsonFindCriteria._id + "-profile"] = new Buffer(content3).toString('base64');
             contact[jsonFindCriteria._id + "-profile-contentType"] = contentType;
             deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
             done1 = 1;
@@ -517,7 +532,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
             if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
               cardStack.cards.push(contact);            
               callback();
-            }
+            }*/
           });
 
           //Attach image to form
@@ -552,7 +567,16 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
             content4 += chunk;
           })
           .on('end', function(chunk){
-            contact[jsonFindCriteria._id + "-company"] = new Buffer(content4).toString('base64');
+            attachImage(contact, jsonFindCriteria._id + "-company", content4, jsonFindCriteria._id + "-company-contentType", contentType, function(){
+              deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+              done2 = 1;
+
+              if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
+                cardStack.cards.push(contact);            
+                callback();
+              }  
+            });
+            /*contact[jsonFindCriteria._id + "-company"] = new Buffer(content4).toString('base64');
             contact[jsonFindCriteria._id + "-company-contentType"] = contentType;
             deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
             done2 = 1;
@@ -560,7 +584,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
             if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
               cardStack.cards.push(contact);
               callback();
-            }
+            }*/
           });
           
           //Attach image to form
@@ -585,6 +609,13 @@ function deletePictures(deletePics, i){
       logger.info("Server - Successfully deleted " + deletePics.cards[i].file);
   });
 }
+
+function attachImage(cardStack, picKey, content, typeKey, type, callback){
+  cardStack[picKey] = new Buffer(content).toString('base64');
+  cardStack[typeKey] = type;
+  callback(); 
+}
+
 module.exports = secureRouter;
 
 
