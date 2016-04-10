@@ -490,7 +490,6 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
         }
         else{
-          done1 = 1
           logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
           
           var readStream3 = fs.createReadStream(file);
@@ -501,17 +500,24 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           .on('end', function(chunk){
             contact[jsonFindCriteria._id + "-profile"] = new Buffer(content3).toString('base64');
             contact[jsonFindCriteria._id + "-profile-contentType"] = contentType;
+            deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+            done1 = 1;
+
+            if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
+              cardStack.cards.push(contact);            
+              callback();
+            }
           });
 
           //Attach image to form
           //form.append(jsonFindCriteria._id + "-profile", fs.createReadStream(file));
 
-          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+          /*deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
           if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
             cardStack.cards.push(contact);            
             callback();
-          }
+          }*/
         }
       });
 
@@ -521,7 +527,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
         }
         else{
-          done2 = 1
+          
           logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
                     
           var readStream4 = fs.createReadStream(file);
@@ -532,16 +538,23 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           .on('end', function(chunk){
             contact[jsonFindCriteria._id + "-company"] = new Buffer(content4).toString('base64');
             contact[jsonFindCriteria._id + "-company-contentType"] = contentType;
+            deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+            done2 = 1;
+
+            if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
+              cardStack.cards.push(contact);
+              callback();
+            }
           });
           
           //Attach image to form
           //form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
-          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+          /*deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
           if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
             cardStack.cards.push(contact);
             callback();
-          }
+          }*/
         }
       });
     }
