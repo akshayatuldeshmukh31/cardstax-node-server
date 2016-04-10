@@ -389,7 +389,7 @@ secureRouter.get("/cards", function(req, res){
                 content1 += chunk;
               })
               .on('end', function(chunk){
-                cardStack[backupData._id + "-profile"] = content1;
+                cardStack[backupData._id + "-profile"] = "data:" + contentType + ";base64," + new Buffer(content1).toString('base64');
                 cardStack[backupData._id + "-profile-contentType"] = contentType;
                 mDone1 = 1;
                 if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
@@ -427,7 +427,7 @@ secureRouter.get("/cards", function(req, res){
                 content2 += chunk;
               })
               .on('end', function(chunk){
-                cardStack[backupData._id + "-company"] = content2;
+                cardStack[backupData._id + "-company"] = "data:" + contentType + ";base64," + new Buffer(content2).toString('base64');
                 cardStack[backupData._id + "-company-contentType"] = contentType;
                 mDone2 = 1;
                 if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
@@ -499,7 +499,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
             content3 += chunk;
           })
           .on('end', function(chunk){
-            contact[jsonFindCriteria._id + "-profile"] = content3;
+            contact[jsonFindCriteria._id + "-profile"] = "data:" + contentType + ";base64," + new Buffer(content3).toString('base64');
             contact[jsonFindCriteria._id + "-profile-contentType"] = contentType;
           });
 
@@ -530,7 +530,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
             content4 += chunk;
           })
           .on('end', function(chunk){
-            contact[jsonFindCriteria._id + "-company"] = content4;
+            contact[jsonFindCriteria._id + "-company"] = "data:" + contentType + ";base64," + new Buffer(content4).toString('base64');
             contact[jsonFindCriteria._id + "-company-contentType"] = contentType;
           });
           
