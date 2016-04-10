@@ -215,6 +215,8 @@ Work done till date -
     	n. UID-profile-contentType (Content type of the image)
     	o. UID-company (Image of the main UID)
     	p. UID-company-contentType (Content Type of the image)
+    	q. email
+    	r. phoneNumber
 
     	Please note that failedRetrievals will be filled ONLY in the case of unsuccessful retrieval of card details from MongoDB. IT WILL NOT ACKNOWLEDGE UNSUCCESSFUL RETRIEVAL OF IMAGES AS INFORMATION FROM MONGODB CAN STILL BE SUFFICIENT FOR INFO ABOUT THE PARTICULAR CONTACT!!! Image retrievals can fail due to lack of internet connection, faults at Amazon and the non-existence of an image if that contact hasn't uploaded any image.
 

@@ -508,7 +508,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
 
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
-          if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1)){
+          if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
             cardStack.cards.push(contact);            
             callback();
           }
@@ -538,7 +538,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           //form.append(jsonFindCriteria._id + "-company", fs.createReadStream(file));
           deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
 
-          if((done1 == 1 || done == -1) && (done2 == 1 || done2 == -1)){
+          if((done1 == 1 || done1 == -1) && (done2 == 1 || done2 == -1)){
             cardStack.cards.push(contact);
             callback();
           }
