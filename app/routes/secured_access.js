@@ -326,6 +326,7 @@ secureRouter.get("/cards", function(req, res){
     }
     else{
       var backupData = JSON.parse(data);
+      logger.debug(backupData);
       
       var jsonFindCriteriaForUser = JSON.parse(JSON.stringify({
         "_id": backupData._id,
