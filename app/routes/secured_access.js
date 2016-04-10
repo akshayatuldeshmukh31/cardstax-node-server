@@ -393,6 +393,7 @@ secureRouter.get("/cards", function(req, res){
                 cardStack[backupData._id + "-profile-contentType"] = contentType;
                 mDone1 = 1;
                 if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+                  logger.debug("SENDING " + cardStack);
                   res.send(JSON.stringify(cardStack));
                   for(var i = 0; i<deletePics.cards.length; i++)
                     deletePictures(deletePics, i);
@@ -431,6 +432,7 @@ secureRouter.get("/cards", function(req, res){
                 cardStack[backupData._id + "-company-contentType"] = contentType;
                 mDone2 = 1;
                 if(mDone1 == 1 && mDone2 == 1 && (backupData.cards.length == 0 || contactRetOver == 1)){
+                  logger.debug("SENDING " + cardStack);
                   res.send(JSON.stringify(cardStack));
                   for(var i = 0; i<deletePics.cards.length; i++)
                     deletePictures(deletePics, i);
@@ -449,6 +451,7 @@ secureRouter.get("/cards", function(req, res){
             
             getContactDetails(cardStack, backupData, i, form, deletePics, function(){
               if(mDone1 == 1 && mDone2 == 1 && (j == backupData.cards.length - 1)){
+                logger.debug("SENDING " + cardStack);
                 res.send(JSON.stringify(cardStack));
                 for(var i = 0; i<deletePics.cards.length; i++)
                   deletePictures(deletePics, i);
