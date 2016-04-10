@@ -243,7 +243,7 @@ function fbLogin(id, res){
 						else{
 							logger.info("POST /fbLogin - Master details created successfully for UID " + userId + "!");
 
-							var token = jwt.sign(item, config.secret, {
+							var token = jwt.sign(jsonObjForLoginColl, config.secret, {
 								expiresIn: 86400 //Expires in 24 hours
 							});
 
@@ -267,7 +267,7 @@ function fbLogin(id, res){
 		}
 		else{
 
-			var token = jwt.sign(item, config.secret, {
+			var token = jwt.sign(jsonObjForLoginColl, config.secret, {
 				expiresIn: 86400 //Expires in 24 hours
 			});
 
