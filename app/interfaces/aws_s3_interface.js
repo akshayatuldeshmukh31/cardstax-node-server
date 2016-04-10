@@ -222,6 +222,9 @@ function imageUploaderEntryPoint(id, profilePic, companyLogo, callback){
   var counter2 = -2;
   var sentCallback = 0;
 
+  logger.debug("Profile pic " + profilePic);
+  logger.debug("Company pic " + companyLogo);
+
   if(profilePic!=null){
     counter1 = -1;
     prepareForProfileImageUpload(profilePic, id, function(result, message){
