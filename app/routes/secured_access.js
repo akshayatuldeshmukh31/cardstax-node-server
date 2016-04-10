@@ -1,13 +1,13 @@
 /*
-	*********************************************************************************
-	File - public_access.js
+  *********************************************************************************
+  File - public_access.js
 
-	This file will define routes which are secured. To access these routes, the user
-	needs the required token for authorization. The routes will be loaded in 
-	./index.js. Any access to any path in this file will have to be authorized at a
+  This file will define routes which are secured. To access these routes, the user
+  needs the required token for authorization. The routes will be loaded in 
+  ./index.js. Any access to any path in this file will have to be authorized at a
   checkpoint which will be the middleware of the secure router.
 
-	*********************************************************************************
+  *********************************************************************************
 */
 
 var jwt = require("jsonwebtoken");
@@ -34,31 +34,31 @@ secureRouter.use(function(req, res, next){
     //Check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
-  	//Decode token
-  	if (token) {
+    //Decode token
+    if (token) {
 
-    	// verifies secret and checks expiration time
-    	jwt.verify(token, config.secret, function(err, decoded) {      
-      	if (err) {
+      // verifies secret and checks expiration time
+      jwt.verify(token, config.secret, function(err, decoded) {      
+        if (err) {
           res.setHeader('Content-Type', 'application/json');
           res.statusCode = 404;
           res.send(JSON.stringify({
             "success": statusCodes.authenticationFailure, 
             "error": statusCodes.authenticationFailureErrorMessage
           }));  
-      	} 
-      	else {
-        	// if everything is good, save to request for use in other routes
-        	req.decoded = decoded;  
-        	next();
-      	}
-    	});
+        } 
+        else {
+          // if everything is good, save to request for use in other routes
+          req.decoded = decoded;  
+          next();
+        }
+      });
 
-  	} 
-  	else {
+    } 
+    else {
 
-    	// if there is no token
-    	// return an error
+      // if there is no token
+      // return an error
       logger.debug("SENT FAILED AUTH");
       res.setHeader('Content-Type', 'application/json');
       res.statusCode = 404;
@@ -66,7 +66,7 @@ secureRouter.use(function(req, res, next){
         "success": statusCodes.authenticationTokenNotProvided, 
         "error": statusCodes.authenticationTokenNotProvidedErrorMessage 
       }));
-  	}
+    }
 });
 
 secureRouter.get("/test", function(req,res){
@@ -490,6 +490,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
           logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
         }
         else{
+          done1 = 1
           logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
           
           var readStream3 = fs.createReadStream(file);
@@ -498,7 +499,6 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
             content3 += chunk;
           })
           .on('end', function(chunk){
-            done1 = 1;
             contact[jsonFindCriteria._id + "-profile"] = new Buffer(content3).toString('base64');
             contact[jsonFindCriteria._id + "-profile-contentType"] = contentType;
           });
@@ -557,6 +557,4 @@ function deletePictures(deletePics, i){
   });
 }
 module.exports = secureRouter;
-
-
 
