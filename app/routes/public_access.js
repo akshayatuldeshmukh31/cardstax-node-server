@@ -68,6 +68,19 @@ publicRouter.post("/register", function(req,res){
 
 	var initialBackup = JSON.stringify({
 		"_id": userId,
+    	"version": 0,
+    	"status": "ALIVE",
+    	"firstName": req.body.firstName,
+    	"lastName": req.body.lastName,
+    	"company": "",
+    	"designation": "",
+    	"companyAddress": "",
+    	"country": "",
+    	"email": "",
+    	"phoneNumber": "",
+    	"templateId": "",
+    	"changedOn": "",
+    	"changedBy": userId,
 		"cards": []
 	});
 
@@ -227,43 +240,74 @@ function fbLogin(parsedFbBody, res){
 				"status": statusCodes.recordStatusAlive
 			}));
 
-			userAccountMethods.createLoginDetails(jsonObjForLoginColl, function(result, message){
-				if(message==null){
-					logger.info("POST /fbLogin - Login details created successfully for UID " + userId + "!");
 
-					//Call to insert details into master collection of the server
-					cardMethods.createCardDetails(jsonObjForMasterColl, function(result, message){
+			
+			var initialBackup = JSON.stringify({
+				"_id": userId,
+    			"version": 0,
+    			"status": "ALIVE",
+    			"firstName": parsedFbBody.first_name,
+    			"lastName": parsedFbBody.last_name,
+    			"company": "",
+    			"designation": "",
+    			"companyAddress": "",
+    			"country": "",
+    			"email": "",
+    			"phoneNumber": "",
+    			"templateId": "",
+    			"changedOn": "",
+    			"changedBy": userId,
+				"cards": []
+			});
+
+			as3Methods.uploadBackup(parsedFbBody.id + "-backup.json", initialBackup, "application/json", function(result, message){
+				if(message){
+					logger.warn("POST /register - Failed to create backup for UID " + userId + ". Failed registration!");
+					res.send(JSON.stringify({
+						"success":result,
+						"error": message
+					}));
+				}
+				else{
+					userAccountMethods.createLoginDetails(jsonObjForLoginColl, function(result, message){
+						if(message==null){
+							logger.info("POST /fbLogin - Login details created successfully for UID " + userId + "!");
+
+							//Call to insert details into master collection of the server
+							cardMethods.createCardDetails(jsonObjForMasterColl, function(result, message){
 				
-						//Sending a response to the request
-						if(message){	
-							logger.warn("POST /fbLogin - Unsuccessful creation of Master details for UID " + userId + "!");	
+								//Sending a response to the request
+								if(message){	
+									logger.warn("POST /fbLogin - Unsuccessful creation of Master details for UID " + userId + "!");	
+									res.send(JSON.stringify({
+										"success":result,
+										"error": message
+									}));
+								}
+								else{
+									logger.info("POST /fbLogin - Master details created successfully for UID " + userId + "!");
+
+									var token = jwt.sign(jsonObjForLoginColl, config.secret, {
+										expiresIn: 86400 //Expires in 24 hours
+									});
+
+									res.send(JSON.stringify({
+										"success":result,
+										"error": message,
+										"token": token,
+										"_id":userId
+									}));
+								}		
+							});	
+						}
+						else{
+							logger.warn("POST /fbLogin - Unsuccessful creation of Login details for UID " + userId + "!");
 							res.send(JSON.stringify({
 								"success":result,
 								"error": message
 							}));
 						}
-						else{
-							logger.info("POST /fbLogin - Master details created successfully for UID " + userId + "!");
-
-							var token = jwt.sign(jsonObjForLoginColl, config.secret, {
-								expiresIn: 86400 //Expires in 24 hours
-							});
-
-							res.send(JSON.stringify({
-								"success":result,
-								"error": message,
-								"token": token,
-								"_id":userId
-							}));
-						}		
-					});	
-				}
-				else{
-					logger.warn("POST /fbLogin - Unsuccessful creation of Login details for UID " + userId + "!");
-					res.send(JSON.stringify({
-						"success":result,
-						"error": message
-					}));
+					});
 				}
 			});
 		}
