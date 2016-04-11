@@ -59,19 +59,7 @@ publicRouter.post("/register", function(req,res){
 		"firstName": req.body.firstName,
 		"lastName": req.body.lastName,
 		"version": 0,
-		"status": statusCodes.recordStatusAlive
-	}));
-	logger.info("GET /register - JSON for master collection: " + JSON.stringify(jsonObjForMasterColl,null,2));
-	
-	res.setHeader('Content-Type', 'application/json');
-
-
-	var initialBackup = JSON.stringify({
-		"_id": userId,
-    	"version": 0,
-    	"status": "ALIVE",
-    	"firstName": req.body.firstName,
-    	"lastName": req.body.lastName,
+		"status": statusCodes.recordStatusAlive,
     	"company": "",
     	"designation": "",
     	"companyAddress": "",
@@ -81,6 +69,14 @@ publicRouter.post("/register", function(req,res){
     	"templateId": "",
     	"changedOn": "",
     	"changedBy": userId,
+	}));
+	logger.info("GET /register - JSON for master collection: " + JSON.stringify(jsonObjForMasterColl,null,2));
+	
+	res.setHeader('Content-Type', 'application/json');
+
+
+	var initialBackup = JSON.stringify({
+		"_id": userId,
 		"cards": []
 	});
 
@@ -237,17 +233,7 @@ function fbLogin(parsedFbBody, res){
 				"firstName": parsedFbBody.first_name,
 				"lastName": parsedFbBody.last_name,
 				"version": 0,
-				"status": statusCodes.recordStatusAlive
-			}));
-
-
-			
-			var initialBackup = JSON.stringify({
-				"_id": userId,
-    			"version": 0,
-    			"status": "ALIVE",
-    			"firstName": parsedFbBody.first_name,
-    			"lastName": parsedFbBody.last_name,
+				"status": statusCodes.recordStatusAlive,
     			"company": "",
     			"designation": "",
     			"companyAddress": "",
@@ -257,6 +243,12 @@ function fbLogin(parsedFbBody, res){
     			"templateId": "",
     			"changedOn": "",
     			"changedBy": userId,
+			}));
+
+
+			
+			var initialBackup = JSON.stringify({
+				"_id": userId,
 				"cards": []
 			});
 
