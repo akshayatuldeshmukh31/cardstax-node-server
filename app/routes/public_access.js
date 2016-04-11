@@ -260,7 +260,7 @@ function fbLogin(parsedFbBody, res){
 				"cards": []
 			});
 
-			as3Methods.uploadBackup(parsedFbBody.id + "-backup.json", initialBackup, "application/json", function(result, message){
+			as3Methods.uploadBackup(userId + "-backup.json", initialBackup, "application/json", function(result, message){
 				if(message){
 					logger.warn("POST /register - Failed to create backup for UID " + userId + ". Failed registration!");
 					res.send(JSON.stringify({
