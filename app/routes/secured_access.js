@@ -557,26 +557,6 @@ function deletePictures(deletePics, i){
   });
 }
 
-
-
-
-
-
-
-
-/*
-*******************************************************************************************************
-*******************************************************************************************************
-*******************************************************************************************************
-*******************************************************************************************************
-*******************************************************************************************************
-*******************************************************************************************************
-*******************************************************************************************************
-*******************************************************************************************************
-*******************************************************************************************************
-*******************************************************************************************************
-*/
-
 secureRouter.get("/cards", function(req,res){
   res.setHeader('Content-Type', 'application/json');
   
@@ -839,4 +819,104 @@ function getContactDetails(cardStack, backupData, i, deletePics, callback){
     }
   });
 }
+
+secureRouter.post("/linkSharing", function(req, res){
+  
+  logger.info("POST /login - JSON received: " + JSON.stringify(req.body,null,2));
+  res.setHeader('Content-Type', 'application/json');
+
+  var temp = new Buffer(req.body.encodedId, 'base64')
+  var decodedId = temp.toString();
+
+  var jsonFindCriteria = JSON.parse(JSON.stringify({
+    "_id": decodedId,
+    "status": statusCodes.recordStatusAlive
+  }));
+
+  var deletePics = JSON.parse(JSON.stringify({
+    "cards": []
+  }));
+
+  cardMethods.searchCardDetails(jsonFindCriteria, function(result, contact, message){
+    if(message){
+      logger.warn("GET /cards - Unsuccessful retrieval of card details for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + decodedId + "!");
+      res.send(JSON.stringify({
+        "success": result,
+        "error": message
+      }));
+    }
+    else{
+
+      var cardDetails = JSON.parse(JSON.stringify({
+        "_id": contact._id,
+        "firstName": contact.firstName,
+        "lastName": contact.lastName,
+        "company": contact.company,
+        "companyAddress": contact.companyAddress,
+        "designation": contact.designation,
+        "country": contact.country,
+        "email": contact.email,
+        "phoneNumber": contact.phoneNumber,
+        "version": contact.version,
+        "templateId": contact.templateId,
+        "changedBy": contact.changedBy,
+        "changedOn": contact.changedOn,
+      }));
+      
+      cardDetails["circle"] = "Default";
+
+      amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
+        if(message){
+          logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + decodedId + "!");
+        
+          amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
+            if(message){
+              logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + decodedId + "!");
+              res.send(JSON.stringify(cardDetails));
+            }
+            else{
+              logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + decodedId + "!")
+                    
+              var content = fs.readFileSync(file);
+              cardDetails[req.body.encodedId + "-company"] = new Buffer(content).toString('base64');
+              cardDetails[req.body.encodedId + "-company-contentType"] = contentType;
+              deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+              res.send(JSON.stringify(cardDetails));
+              for(var i = 0; i<deletePics.cards.length; i++)
+                deletePictures(deletePics, i);
+            }
+          });
+        }
+        else{
+          logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + decodedId + "!")
+          
+          var content = fs.readFileSync(file);
+          cardDetails[req.body.encodedId + "-profile"] = new Buffer(content).toString('base64');
+          cardDetails[req.body.encodedId + "-profile-contentType"] = contentType;
+          deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+          
+          amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
+            if(message){
+              logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + decodedId + "!");
+              res.send(JSON.stringify(cardDetails));
+              for(var i = 0; i<deletePics.cards.length; i++)
+                deletePictures(deletePics, i);
+            }
+            else{
+              logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + decodedId + "!")
+                    
+              var content = fs.readFileSync(file);
+              cardDetails[req.body.encodedId + "-company"] = new Buffer(content).toString('base64');
+              cardDetails[req.body.encodedId + "-company-contentType"] = contentType;
+              deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+              res.send(JSON.stringify(cardDetails));
+              for(var i = 0; i<deletePics.cards.length; i++)
+                deletePictures(deletePics, i);
+            }
+          });
+        }
+      });
+    }
+  });
+});
 module.exports = secureRouter;

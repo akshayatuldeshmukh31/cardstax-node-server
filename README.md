@@ -222,6 +222,46 @@ Work done till date -
 
 
 
+* Developed a function for link sharing
+
+	HTTP Request Header key values:
+
+		a. x-access-token
+		b. Content-Type = "application/json"
+
+	JSON request body
+
+		a. encodedId (Base64 encoded UID of the user whose card needs to be received)
+
+	JSON response body
+
+		Case 1 - Operation fails
+
+			a. success (Not equal to 1)
+			b. error 
+
+		Case 2 - Operation successful
+
+			a. _id
+			b. firstName
+    		c. lastName
+    		d. company
+    		e. designation
+    		f. companyAddress
+    		g. country
+    		h. templateId
+    		i. changedOn
+    		j. changedBy
+    		k. circle (equals "Default")
+    		l. (encodedId)-profile
+    		m. (encodedId)-profile-contentType 
+    		n. (encodedId)-company
+    		o. (encodedId)-company-contentType 
+    		p. email
+    		q. phoneNumber
+    		r. version
+
+
 *** STATUS CODES (RESPONSES AS RECEIVED BY THE APP) ***
 
 * Token Authorization
@@ -279,6 +319,8 @@ Work done till date -
 7. URI for saving backup - /secure/backup		(HTTP METHOD - POST)
 
 8. URI for retrieving backups - /secure/cards 	(HTTP METHOD - GET)
+
+9. URI for link sharing - /secure/linkSharin	(HTTP METHOD - POST)
 
 
 *** Naming Convention for Files in Amazon S3 ***
