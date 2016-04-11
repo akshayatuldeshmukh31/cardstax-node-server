@@ -603,6 +603,7 @@ secureRouter.get("/cards", function(req,res){
             "templateId": item.templateId,
             "changedBy": item.changedBy,
             "changedOn": item.changedOn,
+            "circle": "Default",
             "cards": [],
             "failedRetrievals": []
           }));
@@ -862,7 +863,7 @@ secureRouter.post("/linkSharing", function(req, res){
         "changedBy": contact.changedBy,
         "changedOn": contact.changedOn,
       }));
-      
+
       cardDetails["circle"] = "Default";
 
       amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
