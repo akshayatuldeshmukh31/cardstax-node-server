@@ -306,7 +306,7 @@ secureRouter.post("/backup", function(req, res){
 });
 
 
-//TODO Endpoint for retrieving backups
+/*//TODO Endpoint for retrieving backups
 secureRouter.get("/cards", function(req, res){
 
   res.setHeader('Content-Type', 'application/json');
@@ -546,7 +546,7 @@ function getContactDetails(cardStack, backupData, i, form, deletePics, callback)
       });
     }
   });
-}
+}*/
 
 function deletePictures(deletePics, i){
   fs.unlink(deletePics.cards[i].file, function(err){
@@ -556,5 +556,321 @@ function deletePictures(deletePics, i){
       logger.info("Server - Successfully deleted " + deletePics.cards[i].file);
   });
 }
-module.exports = secureRouter;
 
+
+
+
+
+
+
+
+/*
+*******************************************************************************************************
+*******************************************************************************************************
+*******************************************************************************************************
+*******************************************************************************************************
+*******************************************************************************************************
+*******************************************************************************************************
+*******************************************************************************************************
+*******************************************************************************************************
+*******************************************************************************************************
+*******************************************************************************************************
+*/
+
+secureRouter.get("/cards", function(req,res){
+  res.setHeader('Content-Type', 'application/json');
+  
+  var backupFile = req.decoded._id + "-backup.json";
+  amazonS3Methods.returnBackupToExpressServer(req.decoded._id, backupFile, function(result, message, data){
+    if(message){
+      logger.warn("GET /cards - Failed to retrieve backup for UID " + req.decoded._id);
+      res.send(JSON.stringify({
+        "success": result,
+        "error" : message
+      }));
+    }
+    else{
+      var backupData = JSON.parse(data);
+      
+      var jsonFindCriteriaForUser = JSON.parse(JSON.stringify({
+        "_id": backupData._id,
+        "status": statusCodes.recordStatusAlive
+      }));
+
+      cardMethods.searchCardDetails(jsonFindCriteriaForUser, function(result, item, message){
+        if(message){
+          logger.warn("GET /cards - Failed to retrieve user card details for UID " + backupData._id + ": " + message);
+          res.send(JSON.stringify({
+            "success": result,
+            "error" : message
+          }));
+        }
+        else{
+
+          //Download pics and retrieve information
+          //Prepare JSON response to app side. Cards will store the cards of the user who has requested to retrieve the backup
+          var cardStack = JSON.parse(JSON.stringify({
+            "_id": item._id,
+            "firstName": item.firstName,
+            "lastName": item.lastName,
+            "company": item.company,
+            "companyAddress": item.companyAddress,
+            "designation": item.designation,
+            "country": item.country,
+            "email": item.email,
+            "phoneNumber": item.phoneNumber,
+            "version": item.version,
+            "templateId": item.templateId,
+            "changedBy": item.changedBy,
+            "changedOn": item.changedOn,
+            "cards": [],
+            "failedRetrievals": []
+          }));
+
+          var deletePics = JSON.parse(JSON.stringify({
+            "cards": []
+          }));
+
+          //Download pics of the main user
+          amazonS3Methods.returnProfilePictureToExpressServer(backupData._id, function(result, message, file, contentType){
+            if(message){
+              logger.warn("GET /cards - Unsuccessful retrieval of profile picture for main UID " + backupData._id + "!");
+
+              amazonS3Methods.returnCompanyLogoToExpressServer(backupData._id, function(result, message, file, contentType){
+                if(message){
+                  logger.warn("GET /cards - Unsuccessful retrieval of company logo for main UID " + backupData._id + "!");
+                  
+                  var i = 0, j, counter = 0;
+                  //Retrieve card details of the user's contacts
+                  for(i = 0; i<backupData.cards.length; i++){
+                    j = i;
+                    getContactDetails(cardStack, backupData, i, deletePics, function(){
+                      counter = counter + 1;
+                      logger.debug("Counter " + counter);
+                      if(counter == backupData.cards.length){
+                        logger.debug("Sending");
+                        res.send(JSON.stringify(cardStack));
+                        for(var i = 0; i<deletePics.cards.length; i++)
+                          deletePictures(deletePics, i);
+                      }
+                    });
+                  }
+                  if(backupData.cards.length==0){
+                    res.send(JSON.stringify(cardStack));
+                    for(var i = 0; i<deletePics.cards.length; i++)
+                      deletePictures(deletePics, i);
+                  }
+                }
+                else{
+                  logger.info("GET /cards - Successful retrieval of company logo for main UID " + backupData._id + "!");
+              
+                  deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+                  
+                  var readStream2 = fs.createReadStream(file);
+                  var content2;
+                  readStream2.on('data', function(chunk){
+                    content2 += chunk;
+                  })
+                  .on('end', function(chunk){
+                    cardStack[backupData._id + "-company"] = new Buffer(content2).toString('base64');
+                    cardStack[backupData._id + "-company-contentType"] = contentType;
+
+                    var i = 0, j, counter = 0;
+                    //Retrieve card details of the user's contacts
+                    for(i = 0; i<backupData.cards.length; i++){
+                      j = i;
+                      getContactDetails(cardStack, backupData, i, deletePics, function(){
+                        counter = counter + 1;
+                        logger.debug("Counter " + counter);
+                        if(counter == backupData.cards.length){
+                          logger.debug("Sending");
+                          res.send(JSON.stringify(cardStack));
+                          for(var i = 0; i<deletePics.cards.length; i++)
+                            deletePictures(deletePics, i);
+                        }
+                      });
+                    }
+                    if(backupData.cards.length==0){
+                      res.send(JSON.stringify(cardStack));
+                      for(var i = 0; i<deletePics.cards.length; i++)
+                        deletePictures(deletePics, i);
+                    }
+                  });
+                }
+              });
+            }
+            else{
+              logger.info("GET /cards - Successful retrieval of profile picture for main UID " + backupData._id + "!")
+              
+              deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+              
+              var readStream1 = fs.createReadStream(file);
+              var content1;
+              readStream1.on('data', function(chunk){
+                content1 += chunk;
+              })
+              .on('end', function(chunk){
+                cardStack[backupData._id + "-profile"] = new Buffer(content1).toString('base64');
+                cardStack[backupData._id + "-profile-contentType"] = contentType;
+
+                amazonS3Methods.returnCompanyLogoToExpressServer(backupData._id, function(result, message, file, contentType){
+                  if(message){
+                    logger.warn("GET /cards - Unsuccessful retrieval of company logo for main UID " + backupData._id + "!");
+                    
+                    var i = 0, j, counter = 0;
+                    //Retrieve card details of the user's contacts
+                    for(i = 0; i<backupData.cards.length; i++){
+                      j = i;
+                      getContactDetails(cardStack, backupData, i, deletePics, function(){
+                        counter = counter + 1;
+                        logger.debug("Counter " + counter);
+                        if(counter == backupData.cards.length){
+                          logger.debug("Sending");
+                          res.send(JSON.stringify(cardStack));
+                          for(var i = 0; i<deletePics.cards.length; i++)
+                            deletePictures(deletePics, i);
+                        }
+                      });
+                    }
+                    if(backupData.cards.length==0){
+                      res.send(JSON.stringify(cardStack));
+                      for(var i = 0; i<deletePics.cards.length; i++)
+                        deletePictures(deletePics, i);
+                    }
+                  }
+                  else{
+                    logger.info("GET /cards - Successful retrieval of company logo for main UID " + backupData._id + "!");
+              
+                    deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+                  
+                    var readStream2 = fs.createReadStream(file);
+                    var content2;
+                    readStream2.on('data', function(chunk){
+                      content2 += chunk;
+                    })
+                    .on('end', function(chunk){
+                      cardStack[backupData._id + "-company"] = new Buffer(content2).toString('base64');
+                      cardStack[backupData._id + "-company-contentType"] = contentType;
+
+                      logger.debug(backupData.cards.length);
+
+                      var i = 0, j, counter = 0;
+                      //Retrieve card details of the user's contacts
+                      for(i = 0; i<backupData.cards.length; i++){
+                        j = i;
+                        getContactDetails(cardStack, backupData, i, deletePics, function(){
+                          counter = counter + 1;
+                          logger.debug("Counter " + counter);
+                          if(counter == backupData.cards.length){
+                            logger.debug("Sending");
+                            res.send(JSON.stringify(cardStack));
+                            for(var i = 0; i<deletePics.cards.length; i++)
+                              deletePictures(deletePics, i);
+                          }
+                        });
+                      }
+
+                      if(backupData.cards.length==0){
+                        res.send(JSON.stringify(cardStack));
+                        for(var i = 0; i<deletePics.cards.length; i++)
+                          deletePictures(deletePics, i);
+                      }
+                    });
+                  }
+                });
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
+
+function getContactDetails(cardStack, backupData, i, deletePics, callback){
+
+  var jsonFindCriteria = JSON.parse(JSON.stringify({
+    "_id": backupData.cards[i]._id,
+    "status": statusCodes.recordStatusAlive
+  }));
+
+  cardMethods.searchCardDetails(jsonFindCriteria, function(result, contact, message){
+    if(message){
+      logger.warn("GET /cards - Unsuccessful retrieval of card details for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+      cardStack.failedRetrievals.push(JSON.parse(JSON.stringify({"_id": jsonFindCriteria._id})));
+      callback();
+    }
+    else{
+
+      contact.circle = backupData.cards[i].circle;
+
+      amazonS3Methods.returnProfilePictureToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
+        if(message){
+          logger.warn("GET /cards - Unsuccessful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+        
+          amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
+            if(message){
+              logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+              cardStack.cards.push(contact);
+              callback();
+            }
+            else{
+              logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
+                    
+              var readStream4 = fs.createReadStream(file);
+              var content4;
+              readStream4.on('data', function(chunk){
+                content4 += chunk;
+              })
+              .on('end', function(chunk){
+                contact[jsonFindCriteria._id + "-company"] = new Buffer(content4).toString('base64');
+                contact[jsonFindCriteria._id + "-company-contentType"] = contentType;
+                cardStack.cards.push(contact);
+                deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+                callback();
+              });
+            }
+          });
+        }
+        else{
+          logger.info("GET /cards - Successful retrieval of profile picture for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
+          
+          var readStream3 = fs.createReadStream(file);
+          var content3;
+          readStream3.on('data', function(chunk){
+            content3 += chunk;
+          })
+          .on('end', function(chunk){
+            contact[jsonFindCriteria._id + "-profile"] = new Buffer(content3).toString('base64');
+            contact[jsonFindCriteria._id + "-profile-contentType"] = contentType;
+            deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+            amazonS3Methods.returnCompanyLogoToExpressServer(jsonFindCriteria._id, function(result, message, file, contentType){
+              if(message){
+                logger.warn("GET /cards - Unsuccessful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!");
+                cardStack.cards.push(contact);
+                callback();
+              }
+              else{
+                logger.info("GET /cards - Successful retrieval of company logo for UID " + jsonFindCriteria._id + " belonging to the card stack of UID " + backupData._id + "!")
+                    
+                var readStream4 = fs.createReadStream(file);
+                var content4;
+                readStream4.on('data', function(chunk){
+                  content4 += chunk;
+                })
+                .on('end', function(chunk){
+                  contact[jsonFindCriteria._id + "-company"] = new Buffer(content4).toString('base64');
+                  contact[jsonFindCriteria._id + "-company-contentType"] = contentType;
+                  cardStack.cards.push(contact);
+                  deletePics.cards.push(JSON.parse(JSON.stringify({"file": file})));
+                  callback();
+                });
+              }
+            });
+          });
+        }
+      });
+    }
+  });
+}
+module.exports = secureRouter;
