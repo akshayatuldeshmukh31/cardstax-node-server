@@ -1,5 +1,3 @@
-API KEY - 11858c3d-ec29-4773-85df-d771ef7c2c3c
-
 Current project structure:
 
 
@@ -330,16 +328,4 @@ Work done till date -
 2. Company logo --> (UID of the user) + "-company." + fileExtension
 
 3. Backup 		--> (UID of the user) + "-backup.json"
-
-
-
-Additionals -		
-
-1. Improved simple logging
-
-2. UID is automatically given a new value by an ID generator. Currently gives a new number as a new ID.
-
-3. AWSAccessKeyId = AKIAJOE6W23TWYYAHU2Q
-
-4. AWSSecretKey = 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
 
